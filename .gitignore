@@ -20,6 +20,10 @@
 # production
 /build
 
+# python
+__pycache__/
+*.pyc
+
 # misc
 .DS_Store
 *.pem
@@ -30,8 +34,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — never commit secrets (.env, .env.local, etc.)
+.env
+.env.local
+.env.*.local
 .env*
+!.env.example
+
+# local SQLite (see data/.gitkeep)
+/data/*
+!/data/.gitkeep
 
 # vercel
 .vercel
