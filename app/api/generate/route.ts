@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+/** Gemini AI Studio blocks Hong Kong egress IPs — run in US, not hkg1. */
+export const preferredRegion = ["iad1"];
+
 export async function POST(request: Request) {
   let body: { prompt?: string; model?: string };
   try {

@@ -2,9 +2,25 @@
 
 Next.js app bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## AI generation on `/report` (Gemini — works in HK)
+## AI generation on `/report` (Gemini)
 
-OpenAI often returns **403 Country not supported** in Hong Kong. This project defaults to **Google Gemini**.
+OpenAI often returns **403 Country not supported** from Hong Kong IPs. This project defaults to **Google Gemini** (AI Studio API key).
+
+### Hong Kong + VPN (local dev)
+
+`npm run dev` runs `/api/generate` on **your Mac**. Google **blocks the AI Studio API** from Hong Kong egress (`User location is not supported`). That is why you need VPN locally — you are not calling Gemini from the browser; the **server** must exit via a supported region.
+
+**Production on Vercel does not need your VPN.** Visitors only hit Vercel; Vercel calls Gemini from **US (`iad1`)** by default. This repo pins `vercel.json` + `preferredRegion` on the generate route so functions are not deployed to `hkg1`.
+
+| Where the API runs | Need VPN? |
+|--------------------|-----------|
+| Local `npm run dev` in HK | Usually **yes** (or use Vercel Preview to test) |
+| Vercel production / preview (`iad1`) | **No** for end users |
+| Vercel function region set to Hong Kong | **Will break** — do not use `hkg1` for Gemini |
+
+You do **not** need a proxy on Vercel if regions stay in the US. A proxy is only for unusual corporate firewalls or if you insist on running servers in HK (then use **Vertex AI** on Google Cloud `asia-east2` instead of AI Studio — different SDK and billing).
+
+### Setup
 
 1. Get an API key: [Google AI Studio](https://aistudio.google.com/app/apikey) (free tier available).
 2. In `.env.local`:
@@ -70,6 +86,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Import [streak-limited/BaZi](https://github.com/streak-limited/BaZi) on [Vercel](https://vercel.com/new).
+2. **Environment variables** (Production + Preview):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   - `GEMINI_API_KEY`
+   - `GEMINI_MODEL` (e.g. `gemini-2.5-flash-lite`)
+   - `TURSO_DATABASE_URL`
+   - `TURSO_AUTH_TOKEN`
+
+3. Deploy. Open `/report` on the `*.vercel.app` URL — **Generate** should work without VPN.
+4. In Vercel → Project → Settings → Functions, avoid setting the default region to **Hong Kong** if you use AI Studio keys.
+
+Turso and the Next.js app are reachable from HK; only **outbound Gemini from a HK server IP** is blocked.

@@ -289,7 +289,7 @@ export async function ensureDefaultSubject(): Promise<PersistedReportState> {
     const loaded = await loadSubject(subjects[0].id);
     if (loaded) return loaded;
   }
-  return createSubject("温曉峰", DEFAULT_USER_INPUT);
+  return createSubject("範例命主", DEFAULT_USER_INPUT);
 }
 
 export function getPersistInfo() {

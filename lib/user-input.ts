@@ -40,7 +40,7 @@ export const DEFAULT_USER_INPUT: UserFormInput = {
   birthTime: "10:10",
   birthTimeUnknown: false,
   gender: "男生",
-  name: "温曉峰",
+  name: "",
   sexuality: "異性戀",
   relationship: "有對象了",
   job: "自己做生意",

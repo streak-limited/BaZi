@@ -28,7 +28,6 @@ def main():
             missing.append(desc)
 
     data["metadata"]["prompt_variables"] = [
-        "name",
         "birth_date",
         "birth_time",
         "gender",
@@ -50,7 +49,7 @@ def main():
         "relationship_status",
     ]
     data["metadata"]["prompt_note"] = (
-        "Each AI entry includes a prompt template. "
+        "Prompts use plain language for general readers; no personal names in output. "
         "{{var}} placeholders are filled from user form + BaZi engine before calling the LLM."
     )
 
