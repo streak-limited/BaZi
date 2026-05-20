@@ -109,7 +109,23 @@ function applyLoadedState(
   );
 }
 
-export default function ReportViewer({ data }: { data: ReportData }) {
+export interface ReportViewerProps {
+  data: ReportData;
+  title?: string;
+  subtitle?: string;
+  showPageFilter?: boolean;
+  secondaryNavHref?: string;
+  secondaryNavLabel?: string;
+}
+
+export default function ReportViewer({
+  data,
+  title = "Report content breakdown",
+  subtitle,
+  showPageFilter = true,
+  secondaryNavHref,
+  secondaryNavLabel,
+}: ReportViewerProps) {
   const pageNumbers = useMemo(() => {
     const pages = new Set(data.entries.map((e) => e.page));
     return Array.from(pages).sort((a, b) => a - b);
@@ -508,12 +524,21 @@ export default function ReportViewer({ data }: { data: ReportData }) {
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div>
-            <h1 className={styles.title}>Report content breakdown</h1>
-            <p className={styles.subtitle}>{data.metadata.source}</p>
+            <h1 className={styles.title}>{title}</h1>
+            <p className={styles.subtitle}>
+              {subtitle ?? data.metadata.source}
+            </p>
           </div>
-          <a href="/" className={styles.homeLink}>
-            ← Home
-          </a>
+          <div className={styles.headerNav}>
+            <a href="/" className={styles.homeLink}>
+              ← Home
+            </a>
+            {secondaryNavHref && secondaryNavLabel && (
+              <a href={secondaryNavHref} className={styles.homeLink}>
+                {secondaryNavLabel}
+              </a>
+            )}
+          </div>
         </div>
         <div className={styles.metaRow}>
           <span className={styles.metaChip}>{data.metadata.total_entries} entries</span>
@@ -579,24 +604,26 @@ export default function ReportViewer({ data }: { data: ReportData }) {
       />
 
       <div className={styles.toolbar}>
-        <div className={styles.filterGroup}>
-          <span className={styles.filterLabel}>Page</span>
-          <select
-            className={styles.pageSelect}
-            value={pageFilter === "all" ? "all" : String(pageFilter)}
-            onChange={(e) => {
-              const v = e.target.value;
-              setPageFilter(v === "all" ? "all" : Number(v));
-            }}
-          >
-            <option value="all">All pages (1–20)</option>
-            {pageNumbers.map((p) => (
-              <option key={p} value={p}>
-                Page {p}
-              </option>
-            ))}
-          </select>
-        </div>
+        {showPageFilter && (
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>Page</span>
+            <select
+              className={styles.pageSelect}
+              value={pageFilter === "all" ? "all" : String(pageFilter)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setPageFilter(v === "all" ? "all" : Number(v));
+              }}
+            >
+              <option value="all">All pages (1–20)</option>
+              {pageNumbers.map((p) => (
+                <option key={p} value={p}>
+                  Page {p}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className={styles.filterGroup}>
           <span className={styles.filterLabel}>Type</span>

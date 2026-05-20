@@ -1,3 +1,8 @@
+import {
+  buildShortenFollowUp,
+  isOverLengthLimit,
+  maxOutputTokensForSection,
+} from "@/lib/prompt-lengths";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 
@@ -77,6 +82,7 @@ function geminiModelsToTry(): string[] {
 async function generateWithGemini(
   apiKey: string,
   prompt: string,
+  maxOutputTokens: number,
 ): Promise<{ text: string; model: string }> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const models = geminiModelsToTry();
@@ -87,7 +93,7 @@ async function generateWithGemini(
       model: modelName,
       generationConfig: {
         temperature: 0.85,
-        maxOutputTokens: 2048,
+        maxOutputTokens,
       },
     });
 
@@ -134,13 +140,14 @@ async function generateWithGeminiModel(
   apiKey: string,
   prompt: string,
   modelName: string,
+  maxOutputTokens: number,
 ): Promise<{ text: string; model: string }> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
     model: modelName,
     generationConfig: {
       temperature: 0.85,
-      maxOutputTokens: 2048,
+      maxOutputTokens,
     },
   });
 
@@ -171,13 +178,15 @@ async function generateWithGeminiModel(
 
 export async function generateReportText(
   prompt: string,
-  options?: { geminiModel?: string },
+  options?: { geminiModel?: string; sectionDescription?: string },
 ): Promise<{
   text: string;
   model: string;
   provider: AiProvider;
 }> {
   const provider = getAiProvider();
+  const sectionDescription = options?.sectionDescription;
+  const maxOutputTokens = maxOutputTokensForSection(sectionDescription);
 
   if (provider === "openai") {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -207,11 +216,36 @@ export async function generateReportText(
   }
 
   const requested = options?.geminiModel?.trim();
+  let result: { text: string; model: string };
   if (requested) {
-    const { text, model } = await generateWithGeminiModel(apiKey, prompt, requested);
-    return { text, model, provider: "gemini" };
+    result = await generateWithGeminiModel(
+      apiKey,
+      prompt,
+      requested,
+      maxOutputTokens,
+    );
+  } else {
+    result = await generateWithGemini(apiKey, prompt, maxOutputTokens);
   }
 
-  const { text, model } = await generateWithGemini(apiKey, prompt);
-  return { text, model, provider: "gemini" };
+  if (
+    sectionDescription &&
+    isOverLengthLimit(result.text, sectionDescription)
+  ) {
+    const shortenPrompt = buildShortenFollowUp(
+      result.text,
+      sectionDescription,
+    );
+    const shortened = requested
+      ? await generateWithGeminiModel(
+          apiKey,
+          shortenPrompt,
+          result.model,
+          maxOutputTokens,
+        )
+      : await generateWithGemini(apiKey, shortenPrompt, maxOutputTokens);
+    result = shortened;
+  }
+
+  return { ...result, provider: "gemini" };
 }

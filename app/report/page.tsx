@@ -8,5 +8,13 @@ export const metadata = {
 
 export default function ReportPage() {
   const data = getReportData();
-  return <ReportViewer data={data} />;
+  return (
+    <ReportViewer
+      data={data}
+      title="Report content breakdown"
+      showPageFilter
+      secondaryNavHref="/pre-report"
+      secondaryNavLabel="Pre-report 拆解 →"
+    />
+  );
 }

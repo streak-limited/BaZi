@@ -16,19 +16,34 @@ export default function Home() {
       }}
     >
       <h1 style={{ fontSize: "1.5rem", fontWeight: 600 }}>BaZi</h1>
-      <Link
-        href="/report"
-        style={{
-          color: "#7eb8ff",
-          textDecoration: "none",
-          padding: "0.6rem 1.2rem",
-          border: "1px solid #2a3441",
-          borderRadius: "8px",
-          background: "#1a222c",
-        }}
-      >
-        View report content JSON →
-      </Link>
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
+        <Link
+          href="/report"
+          style={{
+            color: "#7eb8ff",
+            textDecoration: "none",
+            padding: "0.6rem 1.2rem",
+            border: "1px solid #2a3441",
+            borderRadius: "8px",
+            background: "#1a222c",
+          }}
+        >
+          完整報告 JSON →
+        </Link>
+        <Link
+          href="/pre-report"
+          style={{
+            color: "#9fd4b8",
+            textDecoration: "none",
+            padding: "0.6rem 1.2rem",
+            border: "1px solid #2a3441",
+            borderRadius: "8px",
+            background: "#1a222c",
+          }}
+        >
+          Pre-report 拆解 →
+        </Link>
+      </div>
     </main>
   );
 }

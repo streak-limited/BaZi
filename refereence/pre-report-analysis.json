@@ -1,0 +1,500 @@
+{
+  "metadata": {
+    "source": "mzmudang-tw pre-report teaser (p1.html export)",
+    "type_legend": {
+      "static": "固定模板、裝飾圖、影片、按鈕與行銷文案（所有用戶相同）",
+      "computed": "由用戶輸入/八字計算（非 LLM）",
+      "ai": "範山道令對話式敘述（個人化語氣，付費前導流）"
+    },
+    "user_inputs": ["name", "dob_time", "gender", "sexuality", "job_status", "relationship_status"],
+    "sample_subject": {
+      "name": "林易燊",
+      "dob": "1995.08.09 10:10",
+      "pillars": "壬申年 辛亥月 丁酉日 甲辰時"
+    },
+    "total_entries": 51,
+    "by_type": { "static": 32, "computed": 14, "ai": 5 },
+    "section_summary": {
+      "hero_video": { "static": 1, "computed": 0, "ai": 0, "total": 1 },
+      "intro": { "static": 3, "computed": 0, "ai": 0, "total": 3 },
+      "four_pillars": { "static": 0, "computed": 1, "ai": 0, "total": 1 },
+      "name_display": { "static": 0, "computed": 1, "ai": 0, "total": 1 },
+      "personality_tags": { "static": 4, "computed": 0, "ai": 0, "total": 4 },
+      "worry_dialogue": { "static": 7, "computed": 0, "ai": 0, "total": 7 },
+      "fortune_narrative": { "static": 0, "computed": 0, "ai": 5, "total": 5 },
+      "flower_mirror": { "static": 4, "computed": 0, "ai": 0, "total": 4 },
+      "money_teaser": { "static": 7, "computed": 0, "ai": 0, "total": 7 },
+      "expert_card": { "static": 5, "computed": 0, "ai": 0, "total": 5 },
+      "cta": { "static": 1, "computed": 0, "ai": 0, "total": 1 },
+      "bazi_labels": { "static": 0, "computed": 12, "ai": 0, "total": 12 }
+    },
+    "notes": "單頁 pre-report 為完整 20 頁報告的精簡導流版；命盤標籤為範例命主，實際應由 calculateBazi 填入。"
+  },
+  "entries": [
+    {
+      "id": "pre-hero-video",
+      "page": 1,
+      "display_order": 1,
+      "type": "static",
+      "description": "背景影片（銷售用預告片）",
+      "content": "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser/mzmudang_teaser_sales_video.mp4",
+      "image_url": null,
+      "image_url_proxy": null,
+      "section": "hero_video"
+    },
+    {
+      "id": "pre-intro-title",
+      "page": 1,
+      "display_order": 2,
+      "type": "static",
+      "description": "主標題",
+      "content": "為你解命的",
+      "section": "intro"
+    },
+    {
+      "id": "pre-intro-master",
+      "page": 1,
+      "display_order": 3,
+      "type": "static",
+      "description": "大師稱號",
+      "content": "韓國範山道令在此",
+      "section": "intro"
+    },
+    {
+      "id": "pre-intro-tagline",
+      "page": 1,
+      "display_order": 4,
+      "type": "static",
+      "description": "副標",
+      "content": "有意思",
+      "section": "intro"
+    },
+    {
+      "id": "pre-four-pillars",
+      "page": 1,
+      "display_order": 10,
+      "type": "computed",
+      "description": "四柱展示（範例）",
+      "content": "壬申年\n辛亥月\n丁酉日\n甲辰時",
+      "section": "four_pillars"
+    },
+    {
+      "id": "pre-subject-name",
+      "page": 1,
+      "display_order": 11,
+      "type": "computed",
+      "description": "命主姓名（範例）",
+      "content": "林易燊",
+      "section": "name_display"
+    },
+    {
+      "id": "pre-tag-qixiang",
+      "page": 1,
+      "display_order": 20,
+      "type": "static",
+      "description": "性格標籤",
+      "content": "氣場",
+      "section": "personality_tags"
+    },
+    {
+      "id": "pre-tag-mingge",
+      "page": 1,
+      "display_order": 21,
+      "type": "static",
+      "description": "性格標籤",
+      "content": "相當強烈",
+      "section": "personality_tags"
+    },
+    {
+      "id": "pre-tag-mingge2",
+      "page": 1,
+      "display_order": 22,
+      "type": "static",
+      "description": "性格標籤",
+      "content": "這命格不同凡響啊？",
+      "section": "personality_tags"
+    },
+    {
+      "id": "pre-tag-yiyan",
+      "page": 1,
+      "display_order": 23,
+      "type": "static",
+      "description": "性格標籤",
+      "content": "一眼便知",
+      "section": "personality_tags"
+    },
+    {
+      "id": "pre-worry-bg",
+      "page": 1,
+      "display_order": 30,
+      "type": "static",
+      "description": "煩惱對話背景圖",
+      "content": "",
+      "image_url": "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser/04_worry_bg.png",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-q1",
+      "page": 1,
+      "display_order": 31,
+      "type": "static",
+      "description": "煩惱對話提問",
+      "content": "你就是因為這件事煩惱才來的吧",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-q2",
+      "page": 1,
+      "display_order": 32,
+      "type": "static",
+      "description": "煩惱對話副標",
+      "content": "你是什麼樣的人，",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-q3",
+      "page": 1,
+      "display_order": 33,
+      "type": "static",
+      "description": "煩惱對話副標",
+      "content": "你在煩惱什麼，",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-q4",
+      "page": 1,
+      "display_order": 34,
+      "type": "static",
+      "description": "煩惱對話副標",
+      "content": "我全都看得見",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-status",
+      "page": 1,
+      "display_order": 35,
+      "type": "static",
+      "description": "煩惱對話狀態提示",
+      "content": "你現在的狀況是",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-worry-reason",
+      "page": 1,
+      "display_order": 36,
+      "type": "static",
+      "description": "煩惱原因（命格）",
+      "content": "正是因為你的命格",
+      "section": "worry_dialogue"
+    },
+    {
+      "id": "pre-ai-narrative-1",
+      "page": 1,
+      "display_order": 40,
+      "type": "ai",
+      "description": "AI 敘述：外表正經內心易傷",
+      "content": "欸，你——看起來很正經，有禮貌，心其實超容易受傷對吧？  \n你每次表面很配合，其實心裡一直在打小算盤，觀察大家舉動。  \n但你真正最怕孤單，被冷落的時候全身都無力，就是這種感覺。  \n說到底你這個人，渴望控制自己的命運，卻老是被現實一腳踹醒。",
+      "section": "fortune_narrative"
+    },
+    {
+      "id": "pre-ai-narrative-2",
+      "page": 1,
+      "display_order": 41,
+      "type": "ai",
+      "description": "AI 敘述：命格與翻轉",
+      "content": "欸，你的命格挺有意思的。  \n你是那種人脈連結、貴人相挺，靠著眼光和手腕讓大錢自動找上門的人。  \n最後會混進一個極少人能進的圈子，資源能量瞬間放大，連你自己都嚇一跳。  \n但這什麼時候爆發，要怎麼做才能走到那步？付了卦金我就告訴你。",
+      "section": "fortune_narrative"
+    },
+    {
+      "id": "pre-ai-narrative-3",
+      "page": 1,
+      "display_order": 42,
+      "type": "ai",
+      "description": "AI 敘述：人生劇透",
+      "content": "欸，你的命格往後將如何流轉？  \n想不想聽個讓你起雞皮疙瘩的人生劇透？  \n我可以讓你清清楚楚看見眼前的一切，毫不留情地說。",
+      "section": "fortune_narrative"
+    },
+    {
+      "id": "pre-ai-narrative-4",
+      "page": 1,
+      "display_order": 43,
+      "type": "ai",
+      "description": "AI 敘述：順勢與花鏡",
+      "content": "說到底你這個人，渴望控制自己的命運，卻老是被現實一腳踹醒。  \n說到底...是為了錢來的吧？  \n你的命格中有沒有財運？這才是你最想知道的吧。",
+      "section": "fortune_narrative"
+    },
+    {
+      "id": "pre-ai-narrative-5",
+      "page": 1,
+      "display_order": 44,
+      "type": "ai",
+      "description": "AI 敘述：財運時機",
+      "content": "先把手給我看看。  \n嘿嘿，財運可不是一般的命啊？  \n一生之中財運將大爆發的命格。時機與方法早已注定好了。  \n那個機會絕對不能錯過。",
+      "section": "fortune_narrative"
+    },
+    {
+      "id": "pre-flower-title",
+      "page": 1,
+      "display_order": 50,
+      "type": "static",
+      "description": "花鏡區標題",
+      "content": "用花鏡看一看吧",
+      "section": "flower_mirror"
+    },
+    {
+      "id": "pre-flower-subtitle",
+      "page": 1,
+      "display_order": 51,
+      "type": "static",
+      "description": "花鏡區副標",
+      "content": "在讀書會相遇嗎..",
+      "section": "flower_mirror"
+    },
+    {
+      "id": "pre-flower-asset",
+      "page": 1,
+      "display_order": 52,
+      "type": "static",
+      "description": "花鏡裝飾圖",
+      "content": "",
+      "image_url": "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser/07_asset_2.png",
+      "section": "flower_mirror"
+    },
+    {
+      "id": "pre-flower-deco",
+      "page": 1,
+      "display_order": 53,
+      "type": "static",
+      "description": "花鏡區裝飾",
+      "content": "",
+      "image_url": "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser/union_decoration.svg",
+      "section": "flower_mirror"
+    },
+    {
+      "id": "pre-money-headline",
+      "page": 1,
+      "display_order": 60,
+      "type": "static",
+      "description": "財運區主標",
+      "content": "如何順應流勢全部都告訴你",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-bullet-1",
+      "page": 1,
+      "display_order": 61,
+      "type": "static",
+      "description": "行銷要點",
+      "content": "一輩子能摸到的「真正金錢」最大值",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-bullet-2",
+      "page": 1,
+      "display_order": 62,
+      "type": "static",
+      "description": "行銷要點",
+      "content": "一輩子財運大爆發一次的命格？",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-bullet-3",
+      "page": 1,
+      "display_order": 63,
+      "type": "static",
+      "description": "行銷要點",
+      "content": "財運爆炸的",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-bullet-4",
+      "page": 1,
+      "display_order": 64,
+      "type": "static",
+      "description": "行銷要點",
+      "content": "壓倒性的滿足感",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-sub",
+      "page": 1,
+      "display_order": 65,
+      "type": "static",
+      "description": "財運區副標",
+      "content": "一輩子能摸到的「真正金錢」最大值",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-money-body",
+      "page": 1,
+      "display_order": 66,
+      "type": "static",
+      "description": "財運區正文",
+      "content": "財運將大爆發的命格。時機與方法早已注定好了。那個機會絕對不能錯過。",
+      "section": "money_teaser"
+    },
+    {
+      "id": "pre-expert-bg",
+      "page": 1,
+      "display_order": 70,
+      "type": "static",
+      "description": "大師區背景",
+      "content": "",
+      "image_url": "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser/20_price_character.png",
+      "section": "expert_card"
+    },
+    {
+      "id": "pre-expert-title",
+      "page": 1,
+      "display_order": 71,
+      "type": "static",
+      "description": "大師稱號",
+      "content": "MZ韓國範山道令\n正統命理",
+      "section": "expert_card"
+    },
+    {
+      "id": "pre-expert-point-1",
+      "page": 1,
+      "display_order": 72,
+      "type": "static",
+      "description": "大師賣點",
+      "content": "一輩子能摸到的「真正金錢」最大值",
+      "section": "expert_card"
+    },
+    {
+      "id": "pre-expert-point-2",
+      "page": 1,
+      "display_order": 73,
+      "type": "static",
+      "description": "大師賣點",
+      "content": "一輩子財運大爆發一次的命格？",
+      "section": "expert_card"
+    },
+    {
+      "id": "pre-expert-point-3",
+      "page": 1,
+      "display_order": 74,
+      "type": "static",
+      "description": "大師賣點",
+      "content": "壓倒性的滿足感",
+      "section": "expert_card"
+    },
+    {
+      "id": "pre-cta-button",
+      "page": 1,
+      "display_order": 80,
+      "type": "static",
+      "description": "主 CTA 按鈕",
+      "content": "向韓國範山道令算命",
+      "section": "cta"
+    },
+    {
+      "id": "pre-chart-label-正印",
+      "page": 1,
+      "display_order": 90,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "正印",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-pian-cai",
+      "page": 1,
+      "display_order": 91,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "偏財",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-guan",
+      "page": 1,
+      "display_order": 92,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "正官",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-shang-guan",
+      "page": 1,
+      "display_order": 93,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "傷官",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-zheng-cai",
+      "page": 1,
+      "display_order": 94,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "正財",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-changsheng",
+      "page": 1,
+      "display_order": 95,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "長生",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-muyu",
+      "page": 1,
+      "display_order": 96,
+      "type": "computed",
+      "description": "命盤十神標籤（範例）",
+      "content": "沐浴",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-huagai",
+      "page": 1,
+      "display_order": 97,
+      "type": "computed",
+      "description": "神煞標籤（範例）",
+      "content": "華蓋煞",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-niansha",
+      "page": 1,
+      "display_order": 98,
+      "type": "computed",
+      "description": "神煞標籤（範例）",
+      "content": "年煞",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-wangshen",
+      "page": 1,
+      "display_order": 99,
+      "type": "computed",
+      "description": "神煞標籤（範例）",
+      "content": "亡神煞",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-label-disha",
+      "page": 1,
+      "display_order": 100,
+      "type": "computed",
+      "description": "神煞標籤（範例）",
+      "content": "地煞",
+      "section": "bazi_labels"
+    },
+    {
+      "id": "pre-chart-日干",
+      "page": 1,
+      "display_order": 101,
+      "type": "computed",
+      "description": "日干標示",
+      "content": "日干(我)",
+      "section": "bazi_labels"
+    }
+  ]
+}

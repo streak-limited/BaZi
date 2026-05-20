@@ -1,12 +1,15 @@
 export type ContentType = "static" | "computed" | "ai";
 
 export interface ReportEntry {
+  id?: string;
   page: number;
   display_order: number;
   type: ContentType;
   description: string;
   content: string;
   image_url?: string;
+  image_url_proxy?: string | null;
+  section?: string;
   /** LLM prompt template (AI entries only). {{var}} filled at generation time. */
   prompt?: string;
 }
@@ -16,7 +19,7 @@ export interface PageSummary {
   computed: number;
   ai: number;
   total: number;
-  with_image_url: number;
+  with_image_url?: number;
 }
 
 export interface ReportMetadata {
@@ -25,8 +28,10 @@ export interface ReportMetadata {
   user_inputs: string[];
   sample_subject: Record<string, string>;
   total_entries: number;
-  page_summary: Record<string, PageSummary>;
+  page_summary?: Record<string, PageSummary>;
+  section_summary?: Record<string, PageSummary>;
   by_type?: Record<ContentType, number>;
+  notes?: string;
 }
 
 export interface ReportData {

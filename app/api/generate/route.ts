@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const preferredRegion = ["iad1"];
 
 export async function POST(request: Request) {
-  let body: { prompt?: string; model?: string };
+  let body: { prompt?: string; model?: string; sectionDescription?: string };
   try {
     body = await request.json();
   } catch {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
   try {
     const { text, model, provider } = await generateReportText(prompt, {
       geminiModel: geminiModel || undefined,
+      sectionDescription: body.sectionDescription?.trim() || undefined,
     });
     return NextResponse.json({ text, model, provider });
   } catch (err) {

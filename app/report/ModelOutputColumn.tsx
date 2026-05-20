@@ -75,7 +75,11 @@ export default function ModelOutputColumn({
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: filledPrompt, model: modelId }),
+        body: JSON.stringify({
+          prompt: filledPrompt,
+          model: modelId,
+          sectionDescription: entry.description,
+        }),
       });
       const data = (await res.json()) as {
         text?: string;

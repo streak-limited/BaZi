@@ -72,7 +72,7 @@ def main() -> None:
             "  };",
             "  const [lo, hi] = ranges[desc] ?? [400, 700];",
             "  const mid = Math.round((lo + hi) / 2);",
-            '  return `【輸出要求】\\n- 只輸出內文段落，不要標題、不要 JSON、不要 markdown\\n- 全文字數約 ${lo}–${hi} 字（以約 ${mid} 字為佳），2–4 段，段與段之間空一行\\n- 不要用「總之」「綜上所述」收尾`;',
+            '  return `【輸出要求 — 字數硬限制】\\n- 只輸出內文段落，不要標題、不要 JSON、不要 markdown\\n- 全文字數必須在 ${lo}–${hi} 字之間（目標約 ${mid} 字）；超過 ${hi} 字視為不合格\\n- 只寫「本篇要寫什麼」的單一主題，禁止寫其他章節（例如本篇講能力就不要寫感情、大運、年齡建議）\\n- 2–3 段即可，段間空一行；不要用「總之」「綜上所述」收尾\\n- 勿輸出英文欄位值（如 self_employed），工作狀態用中文（上班族／求職中／自己做生意）`;',
             "}",
             "",
             "/** Key = exact `description` field from JSON (AI entries). */",
