@@ -43,6 +43,32 @@ export default function Home() {
         >
           Pre-report 拆解 →
         </Link>
+        <Link
+          href="/ask-gua"
+          style={{
+            color: "#c8a86e",
+            textDecoration: "none",
+            padding: "0.6rem 1.2rem",
+            border: "1px solid #2a3441",
+            borderRadius: "8px",
+            background: "#1a222c",
+          }}
+        >
+          AI 問卦 →
+        </Link>
+        <Link
+          href="/fortune-lots"
+          style={{
+            color: "#d4a8e8",
+            textDecoration: "none",
+            padding: "0.6rem 1.2rem",
+            border: "1px solid #2a3441",
+            borderRadius: "8px",
+            background: "#1a222c",
+          }}
+        >
+          靈籤求籤 →
+        </Link>
       </div>
     </main>
   );

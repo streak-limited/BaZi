@@ -39,6 +39,9 @@ export const PROMPT_LENGTH_BOUNDS: Record<string, [number, number]> = {
   "AI 分析內文：漏財封堵法": [755, 970],
   "AI 分析內文：現在馬上該做的事": [800, 1025],
   "AI 分析內文：厄運的真面目": [1040, 1230],
+  "AI 問卦解卦": [450, 750],
+  "觀音靈籤 AI 解籤": [400, 700],
+  "六十甲子籤 AI 解籤": [400, 700],
 };
 
 /** Count Chinese body length (ignore spaces/newlines), matching editorial 字數. */

@@ -1,0 +1,287 @@
+.page {
+  min-height: 100vh;
+  background: #0f1419;
+  color: #e8eaed;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.header {
+  border-bottom: 1px solid #2a3441;
+  padding: 1.25rem 1.5rem;
+  background: #12171d;
+}
+
+.headerInner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #9aa3ad;
+  margin-top: 0.35rem;
+  line-height: 1.55;
+  max-width: 36rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav a {
+  font-size: 0.875rem;
+  color: #7eb8ff;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card {
+  background: #141a22;
+  border: 1px solid #2a3441;
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+}
+
+.cardTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7682;
+  margin: 0 0 0.85rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.85rem;
+  color: #9aa3ad;
+  margin-bottom: 0.45rem;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #2a3441;
+  background: #0f1419;
+  color: #e8eaed;
+  font-size: 1rem;
+  line-height: 1.55;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #6b8faf;
+}
+
+.textarea:disabled {
+  opacity: 0.6;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 520px) {
+  .fieldRow {
+    grid-template-columns: 1fr 200px;
+    align-items: end;
+  }
+}
+
+.select {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #2a3441;
+  background: #0f1419;
+  color: #e8eaed;
+  font-size: 0.875rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.btnPrimary {
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #6b8faf;
+  color: #0f1419;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #9fc8e8;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  padding: 0.65rem 1.25rem;
+  border: 1px solid #2a3441;
+  border-radius: 8px;
+  background: transparent;
+  color: #9aa3ad;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  border-color: #6b8faf;
+  color: #c8e4f8;
+}
+
+.questionEcho {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hexGrid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .hexGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hexGridSingle {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hexCard {
+  border: 1px solid #2a3441;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #0f1419;
+}
+
+.hexCardHead {
+  margin-bottom: 0.75rem;
+}
+
+.hexName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #c8e4f8;
+  margin: 0;
+}
+
+.hexMeta {
+  font-size: 0.8rem;
+  color: #6b7682;
+  margin: 0.25rem 0 0;
+}
+
+.lineTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.lineTable th,
+.lineTable td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #1e2834;
+}
+
+.lineTable th {
+  color: #6b7682;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.lineChanging {
+  background: rgba(200, 168, 110, 0.08);
+}
+
+.symbol {
+  font-size: 1.1rem;
+  width: 2rem;
+}
+
+.report {
+  white-space: pre-wrap;
+  line-height: 1.75;
+  font-size: 0.95rem;
+  color: #b8c0c8;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: #6b7682;
+  line-height: 1.5;
+  margin: 0.85rem 0 0;
+}
+
+.status {
+  font-size: 0.875rem;
+  color: #9aa3ad;
+  margin: 0;
+}
+
+.error {
+  color: #f0a0a0;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.generateRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.85rem 1rem;
+}
+
+.generateModel {
+  flex: 1;
+  min-width: 200px;
+}
+
+.generateRow .btnPrimary {
+  flex-shrink: 0;
+}
