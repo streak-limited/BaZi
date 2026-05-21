@@ -1,4 +1,4 @@
-/** Inexpensive Gemini models only — for A/B testing prompts on /report */
+/** Inexpensive Gemini models only — for A/B testing prompts on /bazi/report */
 
 export interface GeminiCompareModel {
   id: string;

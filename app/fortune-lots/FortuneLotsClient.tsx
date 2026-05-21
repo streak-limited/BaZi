@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useState } from "react";
+import PageHeader from "@/components/PageHeader";
 import {
   DEFAULT_COMPARE_MODELS,
   GEMINI_COMPARE_MODELS,
@@ -111,19 +111,10 @@ export default function FortuneLotsClient() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <div>
-            <h1 className={styles.title}>靈籤求籤 · AI 解籤</h1>
-            <p className={styles.subtitle}>
-              先揀觀音靈籤（100 首）或六十甲子籤（60 支）；後端程式 random 抽籤，解籤時才呼叫 Gemini。
-            </p>
-          </div>
-          <nav className={styles.nav}>
-            <Link href="/">← Home</Link>
-          </nav>
-        </div>
-      </header>
+      <PageHeader
+        title="靈籤求籤 · AI 解籤"
+        subtitle="觀音靈籤（100 首）或六十甲子籤（60 支）；程式抽籤，解籤時才呼叫 Gemini"
+      />
 
       <main className={styles.main}>
         <section className={styles.card}>

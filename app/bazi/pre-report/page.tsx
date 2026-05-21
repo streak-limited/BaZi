@@ -1,4 +1,4 @@
-import ReportViewer from "@/app/report/ReportViewer";
+import ReportViewer from "@/app/bazi/report/ReportViewer";
 import { getPreReportData } from "@/lib/pre-report-data";
 
 export const metadata = {
@@ -14,8 +14,8 @@ export default function PreReportPage() {
       title="Pre-report · 範山道令導流頁"
       subtitle={`單頁精簡版（對照完整 20 頁）· ${data.metadata.source}`}
       showPageFilter={false}
-      secondaryNavHref="/report"
-      secondaryNavLabel="完整報告 JSON →"
+      secondaryNavHref="/bazi/report"
+      secondaryNavLabel="完整報告 →"
     />
   );
 }

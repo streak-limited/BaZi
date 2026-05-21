@@ -15,7 +15,7 @@ interface Props {
   onChange: (next: UserInputState) => void;
 }
 
-/** @deprecated Prefer SubjectFormModal + SubjectCards on /report */
+/** @deprecated Prefer SubjectFormModal + SubjectCards on /bazi/report */
 export default function UserInputForm({ state, onChange }: Props) {
   return (
     <section className={styles.userFormSection}>

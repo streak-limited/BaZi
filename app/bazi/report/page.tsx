@@ -13,8 +13,8 @@ export default function ReportPage() {
       data={data}
       title="Report content breakdown"
       showPageFilter
-      secondaryNavHref="/pre-report"
-      secondaryNavLabel="Pre-report 拆解 →"
+      secondaryNavHref="/bazi/pre-report"
+      secondaryNavLabel="Pre-report →"
     />
   );
 }

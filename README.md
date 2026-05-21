@@ -2,7 +2,7 @@
 
 Next.js app bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## AI generation on `/report` (Gemini)
+## AI generation on `/bazi/report` (Gemini)
 
 OpenAI often returns **403 Country not supported** from Hong Kong IPs. This project defaults to **Google Gemini** (AI Studio API key).
 
@@ -34,11 +34,11 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 3. Restart: `npm run dev`
 
 **404 on gemini-1.5-flash?** That model is retired — use `gemini-3.1-flash-lite` or `gemini-2.5-flash-lite` (see your [rate limits](https://ai.dev/rate-limit)). **429?** Wait ~1 minute between clicks; the server tries fallback models automatically.
-4. Open [/report](http://localhost:3000/report) → filter **AI** → **Generate**
+4. Open [/bazi/report](http://localhost:3000/bazi/report) → filter **AI** → **Generate**
 
 To use OpenAI when your region allows it: set `AI_PROVIDER=openai` and `OPENAI_API_KEY=sk-...`.
 
-## Database (`/report`)
+## Database (`/bazi/report`)
 
 每位 **命主** 獨立一筆記錄：表單、模型比較欄設定、各段 AI 生成結果。頁頂 **命主管理** 可切換／新增／刪除。
 
@@ -94,7 +94,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
    - `TURSO_DATABASE_URL`
    - `TURSO_AUTH_TOKEN`
 
-3. Deploy. Open `/report` on the `*.vercel.app` URL — **Generate** should work without VPN.
+3. Deploy. Open `/bazi/report` on the `*.vercel.app` URL — **Generate** should work without VPN.
 4. In Vercel → Project → Settings → Functions, avoid setting the default region to **Hong Kong** if you use AI Studio keys.
 
 Turso and the Next.js app are reachable from HK; only **outbound Gemini from a HK server IP** is blocked.

@@ -15,9 +15,9 @@ import AiEntryCard from "./AiEntryCard";
 import ModelCompareBar from "./ModelCompareBar";
 import SubjectCards from "./SubjectCards";
 import SubjectFormModal from "./SubjectFormModal";
+import PageHeader from "@/components/PageHeader";
+import { ACTIVE_SUBJECT_KEY } from "@/lib/subject-session";
 import styles from "./report.module.css";
-
-const ACTIVE_SUBJECT_KEY = "bazi-active-subject";
 
 type PersistStatus = "loading" | "ready" | "saving" | "saved" | "error";
 type SubjectModalState =
@@ -521,25 +521,13 @@ export default function ReportViewer({
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <div>
-            <h1 className={styles.title}>{title}</h1>
-            <p className={styles.subtitle}>
-              {subtitle ?? data.metadata.source}
-            </p>
-          </div>
-          <div className={styles.headerNav}>
-            <a href="/" className={styles.homeLink}>
-              ← Home
-            </a>
-            {secondaryNavHref && secondaryNavLabel && (
-              <a href={secondaryNavHref} className={styles.homeLink}>
-                {secondaryNavLabel}
-              </a>
-            )}
-          </div>
-        </div>
+      <PageHeader
+        title={title}
+        subtitle={subtitle ?? data.metadata.source}
+        secondaryHref={secondaryNavHref}
+        secondaryLabel={secondaryNavLabel}
+      />
+      <div className={styles.toolbar}>
         <div className={styles.metaRow}>
           <span className={styles.metaChip}>{data.metadata.total_entries} entries</span>
           {activeSubject && (
@@ -557,7 +545,7 @@ export default function ReportViewer({
             {generatedCount > 0 && ` · ${generatedCount} 則生成已存`}
           </span>
         </div>
-      </header>
+      </div>
 
       <SubjectCards
         subjects={subjects}

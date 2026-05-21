@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import PageHeader from "@/components/PageHeader";
 import { useCallback, useState } from "react";
 import { generateHexagramLines } from "@/lib/iching/coins";
 import {
@@ -143,19 +143,10 @@ export default function AskGuaClient() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <div>
-            <h1 className={styles.title}>AI 問卦</h1>
-            <p className={styles.subtitle}>
-              輸入問題、起卦後，選擇模型生成解卦報告。
-            </p>
-          </div>
-          <nav className={styles.nav}>
-            <Link href="/">← Home</Link>
-          </nav>
-        </div>
-      </header>
+      <PageHeader
+        title="AI 問卦"
+        subtitle="輸入問題、起卦後，選擇模型生成解卦報告"
+      />
 
       <main className={styles.main}>
         <section className={styles.card}>

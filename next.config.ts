@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
         destination: "/fortune-lots",
         permanent: true,
       },
+      {
+        source: "/report",
+        destination: "/bazi/report",
+        permanent: true,
+      },
+      {
+        source: "/pre-report",
+        destination: "/bazi/pre-report",
+        permanent: true,
+      },
     ];
   },
 };

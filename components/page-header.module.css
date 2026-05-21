@@ -1,0 +1,66 @@
+.header {
+  border-bottom: 1px solid #2a3441;
+  padding: 1.25rem 1.5rem;
+  background: #12171d;
+}
+
+.inner {
+  max-width: 96rem;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.titleBlock {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: #e8eaed;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #9aa3ad;
+  margin: 0.35rem 0 0;
+  line-height: 1.55;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: center;
+}
+
+.backLink {
+  font-size: 0.875rem;
+  color: #9aa3ad;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #2a3441;
+  border-radius: 8px;
+  background: #0f1419;
+}
+
+.backLink:hover {
+  color: #e8eaed;
+  border-color: #4a5568;
+}
+
+.secondaryLink {
+  font-size: 0.875rem;
+  color: #7eb8ff;
+  text-decoration: none;
+}
+
+.secondaryLink:hover {
+  text-decoration: underline;
+}

@@ -42,6 +42,7 @@ export const PROMPT_LENGTH_BOUNDS: Record<string, [number, number]> = {
   "AI 問卦解卦": [450, 750],
   "觀音靈籤 AI 解籤": [400, 700],
   "六十甲子籤 AI 解籤": [400, 700],
+  "每日開運運程 AI": [180, 320],
 };
 
 /** Count Chinese body length (ignore spaces/newlines), matching editorial 字數. */

@@ -1,0 +1,103 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: #0f1419;
+  color: #e8eaed;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.tagline {
+  font-size: 0.9rem;
+  color: #9aa3ad;
+  margin: 0 0 2rem;
+  text-align: center;
+  max-width: 28rem;
+}
+
+.menu {
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.groupTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6b7682;
+  margin: 0 0 0.5rem;
+}
+
+.groupList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menuLink {
+  display: block;
+  padding: 0.85rem 1rem;
+  border: 1px solid #2a3441;
+  border-radius: 10px;
+  background: #1a222c;
+  text-decoration: none;
+  color: #e8eaed;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.menuLink:hover {
+  border-color: #4a5568;
+  background: #222b36;
+}
+
+.menuLinkLabel {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.menuLinkDesc {
+  display: block;
+  font-size: 0.78rem;
+  color: #9aa3ad;
+  margin-top: 0.25rem;
+  line-height: 1.45;
+}
+
+.menuLinkBazi {
+  border-left: 3px solid #7eb8ff;
+}
+
+.menuLinkPre {
+  border-left: 3px solid #9fd4b8;
+}
+
+.menuLinkGua {
+  border-left: 3px solid #c8a86e;
+}
+
+.menuLinkLots {
+  border-left: 3px solid #d4a8e8;
+}
+
+.menuLinkDaily {
+  border-left: 3px solid #f0c987;
+}
