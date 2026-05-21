@@ -76,29 +76,48 @@
 }
 
 .systemPicker {
-  border: none;
   margin: 0 0 1rem;
-  padding: 0;
+}
+
+.systemToggle {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
+  gap: 0.5rem;
 }
 
-.systemPicker legend {
-  width: 100%;
-}
-
-.radioLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.9rem;
-  color: #c8d0d8;
+.systemBtn {
+  flex: 1 1 12rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #2a3441;
+  border-radius: 8px;
+  background: #0f1419;
+  color: #9aa3ad;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: left;
   cursor: pointer;
+  font-family: inherit;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
 }
 
-.radioLabel input {
-  accent-color: #c9a227;
+.systemBtn:hover:not(:disabled) {
+  border-color: #b88fc8;
+  color: #e8eaed;
+}
+
+.systemBtnActive {
+  border-color: #b88fc8;
+  background: rgba(107, 74, 122, 0.35);
+  color: #f0e6f4;
+  font-weight: 600;
+}
+
+.systemBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .textarea {

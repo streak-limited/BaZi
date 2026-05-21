@@ -104,6 +104,7 @@ export default function FortuneLotsClient() {
   }, [lot, question, model]);
 
   const busy = drawing || step === "loading";
+  const systemPickerLocked = step !== "input" || drawing;
   const showLot = lot && (step === "lot" || step === "loading" || step === "report");
   const showGenerate = lot && (step === "lot" || step === "loading");
   const deityLabel = lot ? LOT_SYSTEM_META[lot.system].deity : meta.deity;
@@ -127,29 +128,35 @@ export default function FortuneLotsClient() {
       <main className={styles.main}>
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>求籤</h2>
-          <fieldset className={styles.systemPicker} disabled={step !== "input" || busy}>
-            <legend className={styles.label}>籤種</legend>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="lotSystem"
-                value="guanyin"
-                checked={system === "guanyin"}
-                onChange={() => setSystem("guanyin")}
-              />
-              觀音靈籤（1–100）
-            </label>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="lotSystem"
-                value="jiazi"
-                checked={system === "jiazi"}
-                onChange={() => setSystem("jiazi")}
-              />
-              六十甲子籤（1–60）
-            </label>
-          </fieldset>
+          <div
+            className={styles.systemPicker}
+            role="radiogroup"
+            aria-label="籤種"
+          >
+            <span className={styles.label} id="lot-system-label">
+              籤種
+            </span>
+            <div className={styles.systemToggle} aria-labelledby="lot-system-label">
+              {(["guanyin", "jiazi"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={system === value}
+                  className={
+                    system === value
+                      ? `${styles.systemBtn} ${styles.systemBtnActive}`
+                      : styles.systemBtn
+                  }
+                  onClick={() => setSystem(value)}
+                  disabled={systemPickerLocked}
+                >
+                  {LOT_SYSTEM_META[value].label}
+                  {value === "guanyin" ? "（1–100）" : "（1–60）"}
+                </button>
+              ))}
+            </div>
+          </div>
           <label className={styles.label} htmlFor="question">
             你想問什麼？
           </label>
