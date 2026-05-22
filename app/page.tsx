@@ -2,6 +2,7 @@ import HomeCatalog from "@/components/home/HomeCatalog";
 import {
   getTrialCountsByModel,
   listActiveModels,
+  listCatalogTags,
 } from "@/lib/products/model-store";
 import Link from "next/link";
 import styles from "./home.module.css";
@@ -14,9 +15,10 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [models, trialCounts] = await Promise.all([
+  const [models, trialCounts, catalogTags] = await Promise.all([
     listActiveModels(),
     getTrialCountsByModel(),
+    listCatalogTags(),
   ]);
 
   return (
@@ -37,7 +39,11 @@ export default async function HomePage() {
               尚無可用產品。請在 Supabase 建立 models 與 tags，或檢查連線設定。
             </div>
           ) : (
-            <HomeCatalog models={models} trialCounts={trialCounts} />
+            <HomeCatalog
+              models={models}
+              trialCounts={trialCounts}
+              catalogTags={catalogTags}
+            />
           )}
 
           <p className={styles.footer}>

@@ -1,6 +1,6 @@
 import type { ReportEntry } from "@/lib/report-types";
 
-/** Stable key on each entry — matches model_prompt_entries.entry_key */
+/** Slot id on each entry — {slug}-{phase}-{page}-{order} (derived, not typed in admin) */
 export function entryKeyOf(entry: { entry_key?: string; id?: string }): string {
   return entry.entry_key ?? entry.id ?? "";
 }

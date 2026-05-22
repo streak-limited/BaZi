@@ -43,24 +43,63 @@ async function loadTagsForModels(
     .select("model_id, tags(id, label, sort_order)")
     .in("model_id", modelIds);
 
-  if (error) {
-    console.warn("[loadTagsForModels]", error.message);
-    return out;
-  }
-
-  for (const row of data ?? []) {
-    const modelId = String(row.model_id);
-    const tagRaw = row.tags as Record<string, unknown> | Record<string, unknown>[] | null;
-    const tagObj = Array.isArray(tagRaw) ? tagRaw[0] : tagRaw;
-    if (!tagObj) continue;
-    if (!out[modelId]) out[modelId] = [];
-    out[modelId].push(parseTagRow(tagObj));
+  if (!error && data?.length) {
+    for (const row of data) {
+      const modelId = String(row.model_id);
+      const tagRaw = row.tags as
+        | Record<string, unknown>
+        | Record<string, unknown>[]
+        | null;
+      const tagObj = Array.isArray(tagRaw) ? tagRaw[0] : tagRaw;
+      if (!tagObj) continue;
+      if (!out[modelId]) out[modelId] = [];
+      out[modelId].push(parseTagRow(tagObj));
+    }
+  } else if (error) {
+    console.warn("[loadTagsForModels] embed query failed:", error.message);
+    const { data: links, error: linkErr } = await db
+      .from("model_tags")
+      .select("model_id, tag_id")
+      .in("model_id", modelIds);
+    if (!linkErr && links?.length) {
+      const tagIds = [...new Set(links.map((r) => String(r.tag_id)))];
+      const { data: tagRows } = await db
+        .from("tags")
+        .select("id, label, sort_order")
+        .in("id", tagIds);
+      const tagById = new Map(
+        (tagRows ?? []).map((t) => [String(t.id), parseTagRow(t as Record<string, unknown>)]),
+      );
+      for (const link of links) {
+        const modelId = String(link.model_id);
+        const tag = tagById.get(String(link.tag_id));
+        if (!tag) continue;
+        if (!out[modelId]) out[modelId] = [];
+        out[modelId].push(tag);
+      }
+    }
   }
 
   for (const id of Object.keys(out)) {
     out[id].sort((a, b) => a.sort_order - b.sort_order);
   }
   return out;
+}
+
+export async function listCatalogTags(): Promise<ProductTag[]> {
+  if (!isSupabaseConfigured()) return [];
+  const db = getSupabaseAdmin();
+  const { data, error } = await db
+    .from("tags")
+    .select("id, label, sort_order")
+    .eq("is_active", true)
+    .order("sort_order");
+  if (error) {
+    if (error.message.includes("tags")) return [];
+    console.warn("[listCatalogTags]", error.message);
+    return [];
+  }
+  return (data ?? []).map((r) => parseTagRow(r as Record<string, unknown>));
 }
 
 function rowToModel(

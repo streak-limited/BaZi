@@ -12,6 +12,85 @@ export interface ModelUpsertInput {
   is_active?: boolean;
   config?: Partial<ModelConfig>;
   tag_ids?: string[];
+  /** Free-text labels — creates tags in DB if needed */
+  tag_labels?: string[];
+}
+
+/** Stable tag id from label (supports CJK) */
+export function tagIdFromLabel(label: string): string {
+  const trimmed = label.trim();
+  const base = trimmed
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\u4e00-\u9fff-]/g, "")
+    .replace(/^-+|-+$/g, "");
+  if (base.length >= 2) return base;
+  const hash = Buffer.from(trimmed, "utf8").toString("base64url").slice(0, 10);
+  return `tag-${hash}`;
+}
+
+export async function upsertTagByLabel(
+  label: string,
+  sortOrder: number,
+): Promise<string> {
+  const db = getSupabaseAdmin();
+  const trimmed = label.trim();
+  if (!trimmed) throw new Error("Empty tag label");
+
+  const { data: byLabel } = await db
+    .from("tags")
+    .select("id")
+    .eq("label", trimmed)
+    .maybeSingle();
+  if (byLabel?.id) return String(byLabel.id);
+
+  let id = tagIdFromLabel(trimmed);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { error } = await db.from("tags").insert({
+      id: attempt > 0 ? `${id}-${attempt}` : id,
+      label: trimmed,
+      sort_order: sortOrder,
+      is_active: true,
+    });
+    if (!error) return attempt > 0 ? `${id}-${attempt}` : id;
+    if (error.message.includes("duplicate key") && error.message.includes("label")) {
+      const { data: again } = await db
+        .from("tags")
+        .select("id")
+        .eq("label", trimmed)
+        .maybeSingle();
+      if (again?.id) return String(again.id);
+    }
+    id = `${tagIdFromLabel(trimmed)}-${attempt + 1}`;
+  }
+  throw new Error(`Failed to create tag: ${trimmed}`);
+}
+
+export async function syncModelTagsByLabels(
+  modelId: string,
+  labels: string[],
+): Promise<void> {
+  const unique = [
+    ...new Set(labels.map((l) => l.trim()).filter(Boolean)),
+  ];
+  const tagIds: string[] = [];
+  for (let i = 0; i < unique.length; i++) {
+    tagIds.push(await upsertTagByLabel(unique[i], (i + 1) * 10));
+  }
+  await setModelTags(modelId, tagIds);
+}
+
+async function applyTags(
+  modelId: string,
+  input: Pick<ModelUpsertInput, "tag_ids" | "tag_labels">,
+): Promise<void> {
+  if (input.tag_labels !== undefined) {
+    await syncModelTagsByLabels(modelId, input.tag_labels);
+    return;
+  }
+  if (input.tag_ids !== undefined) {
+    await setModelTags(modelId, input.tag_ids);
+  }
 }
 
 export async function createModel(input: ModelUpsertInput): Promise<ProductModel> {
@@ -40,8 +119,8 @@ export async function createModel(input: ModelUpsertInput): Promise<ProductModel
   }
   if (res.error) throw new Error(res.error.message);
 
-  if (input.tag_ids?.length) {
-    await setModelTags(input.id, input.tag_ids);
+  if (input.tag_labels !== undefined || input.tag_ids !== undefined) {
+    await applyTags(input.id, input);
   }
   const model = await getModelById(input.id);
   if (!model) throw new Error("Failed to load created model");
@@ -85,8 +164,8 @@ export async function updateModel(
   }
   if (res.error) throw new Error(res.error.message);
 
-  if (input.tag_ids !== undefined) {
-    await setModelTags(id, input.tag_ids);
+  if (input.tag_labels !== undefined || input.tag_ids !== undefined) {
+    await applyTags(id, input);
   }
   const model = await getModelById(id);
   if (!model) throw new Error("Failed to load updated model");

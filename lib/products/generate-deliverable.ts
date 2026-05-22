@@ -1,13 +1,24 @@
 import { generateReportText } from "@/lib/ai-generate";
-import { calculateBazi, type PromptVariableMap } from "@/lib/bazi/calculate";
+import { calculateBazi, type BaziChart, type PromptVariableMap } from "@/lib/bazi/calculate";
 import { extractChartLabels } from "@/lib/bazi-journey/chart-labels";
+import {
+  getResultAiSlotEntries,
+  getResultLayoutEntries,
+} from "@/lib/bazi-journey/result-page-static";
 import type { ResultPayload } from "@/lib/bazi-journey/types";
-import type { BaziChart } from "@/lib/bazi/calculate";
 import { fillPrompt } from "@/lib/fill-prompt";
 import { getPreReportData } from "@/lib/pre-report-data";
 import { PRE_REPORT_PROMPTS_BY_DESCRIPTION } from "@/lib/pre-report-prompts";
-import { promptRowToReportEntry } from "@/lib/report/entries";
-import { getPromptTemplatesAsEntries, listPromptEntries } from "@/lib/products/prompt-store";
+import {
+  aiSlotsFromDbRows,
+  mergeAiPromptsIntoSlots,
+} from "@/lib/products/merge-ai-prompts";
+import { getModelById } from "@/lib/products/model-store";
+import {
+  buildPromptSlotId,
+  promptSlotPositionKey,
+} from "@/lib/products/prompt-slot-id";
+import { listAiPromptEntries } from "@/lib/products/prompt-store";
 import type { PromptPhase } from "@/lib/products/prompt-types";
 import type { ReportDeliverable, ResultDeliverable } from "@/lib/products/types";
 import type { ReportEntry } from "@/lib/report-types";
@@ -28,24 +39,14 @@ const CHART_LABEL_IDS = [
   "pre-chart-日干",
 ] as const;
 
-async function loadTemplateEntries(
-  modelId: string,
-  phase: PromptPhase,
-): Promise<ReportEntry[]> {
-  const fromDb = await getPromptTemplatesAsEntries(modelId, phase);
-  if (fromDb.length > 0) return fromDb;
-  if (phase === "result") {
-    return getPreReportData().entries.map((e) => ({
-      ...e,
-      entry_key: e.id,
-      prompt:
-        e.prompt ??
-        (e.type === "ai"
-          ? PRE_REPORT_PROMPTS_BY_DESCRIPTION[e.description]
-          : undefined),
-    }));
-  }
-  return [];
+function loadLayoutEntries(phase: PromptPhase): ReportEntry[] {
+  if (phase === "result") return getResultLayoutEntries();
+  return getPreReportData().entries.filter((e) => e.type !== "ai");
+}
+
+function loadCodeAiSlots(phase: PromptPhase): ReportEntry[] {
+  if (phase === "result") return getResultAiSlotEntries();
+  return getPreReportData().entries.filter((e) => e.type === "ai");
 }
 
 function formatFourPillars(fourPillars: string): string {
@@ -71,24 +72,34 @@ function buildComputedMap(
 async function resolveAiContent(
   entry: ReportEntry,
   variables: PromptVariableMap,
-  bounds?: { min: number | null; max: number | null },
 ): Promise<string> {
   const template =
     entry.prompt ??
     PRE_REPORT_PROMPTS_BY_DESCRIPTION[entry.description];
   if (!template) {
-    throw new Error(`Missing prompt for ${entry.entry_key ?? entry.id}: ${entry.description}`);
+    throw new Error(
+      `Missing prompt at page ${entry.page} slot ${entry.display_order}: ${entry.description}`,
+    );
   }
   const prompt = fillPrompt(template, variables);
   const { text } = await generateReportText(prompt, {
     sectionDescription: entry.description,
   });
-  void bounds;
   return text.replace(/\s{2,}/g, " ").trim();
 }
 
-function entryKey(e: ReportEntry): string {
-  return e.entry_key ?? e.id ?? `p${e.page}-o${e.display_order}`;
+function assignSlotId(
+  entry: ReportEntry,
+  modelSlug: string,
+  phase: PromptPhase,
+): ReportEntry {
+  const slotId = buildPromptSlotId(
+    modelSlug,
+    phase,
+    entry.page,
+    entry.display_order,
+  );
+  return { ...entry, entry_key: slotId, id: slotId };
 }
 
 async function generatePhaseEntries(
@@ -105,14 +116,56 @@ async function generatePhaseEntries(
     throw new Error(bazi.error ?? "八字計算失敗");
   }
 
-  let template = await loadTemplateEntries(modelId, phase);
-  if (template.length === 0 && phase === "report") {
-    template = await loadTemplateEntries(modelId, "result");
+  const model = await getModelById(modelId);
+  const modelSlug = model?.slug ?? modelId;
+
+  const layout = loadLayoutEntries(phase);
+
+  const aiDbRows = await listAiPromptEntries(modelId, phase, { activeOnly: true });
+
+  let aiWithPrompts: ReportEntry[];
+  if (aiDbRows.length > 0) {
+    const fromDb = aiSlotsFromDbRows(aiDbRows, modelSlug);
+    const codeSlots = loadCodeAiSlots(phase);
+    aiWithPrompts =
+      codeSlots.length > 0
+        ? mergeAiPromptsIntoSlots(
+            codeSlots.map((e) => assignSlotId(e, modelSlug, phase)),
+            aiDbRows,
+          )
+        : fromDb;
+    if (fromDb.length > codeSlots.length) {
+      const mergedPositions = new Set(
+        aiWithPrompts.map((e) => promptSlotPositionKey(e.page, e.display_order)),
+      );
+      for (const extra of fromDb) {
+        const pos = promptSlotPositionKey(extra.page, extra.display_order);
+        if (!mergedPositions.has(pos)) {
+          aiWithPrompts.push(extra);
+          mergedPositions.add(pos);
+        }
+      }
+    }
+  } else {
+    const codeSlots = loadCodeAiSlots(phase);
+    if (codeSlots.length === 0 && phase === "report") {
+      aiWithPrompts = getResultAiSlotEntries().map((e) =>
+        assignSlotId(e, modelSlug, phase),
+      );
+    } else {
+      aiWithPrompts = codeSlots.map((e) => assignSlotId(e, modelSlug, phase));
+    }
   }
 
-  const dbRows = await listPromptEntries(modelId, phase);
-  const boundsByKey = new Map(
-    dbRows.map((r) => [r.entry_key, { min: r.length_min, max: r.length_max }]),
+  const template = [...layout, ...aiWithPrompts].sort(
+    (a, b) => a.page - b.page || a.display_order - b.display_order,
+  );
+
+  const boundsByPosition = new Map(
+    aiDbRows.map((r) => [
+      promptSlotPositionKey(r.page, r.display_order),
+      { min: r.length_min, max: r.length_max },
+    ]),
   );
 
   const computedMap = buildComputedMap(
@@ -124,37 +177,51 @@ async function generatePhaseEntries(
   const aiEntries = template.filter((e) => e.type === "ai");
   const aiContents = await Promise.all(
     aiEntries.map(async (entry) => {
-      const key = entryKey(entry);
-      const b = boundsByKey.get(key);
+      const slotId = buildPromptSlotId(
+        modelSlug,
+        phase,
+        entry.page,
+        entry.display_order,
+      );
+      const pos = promptSlotPositionKey(entry.page, entry.display_order);
+      const b = boundsByPosition.get(pos);
+      void b;
       return {
-        key,
-        content: await resolveAiContent(entry, bazi.variables!, {
-          min: b?.min ?? null,
-          max: b?.max ?? null,
-        }),
+        slotId,
+        content: await resolveAiContent(entry, bazi.variables!),
       };
     }),
   );
-  const aiByKey = Object.fromEntries(aiContents.map((a) => [a.key, a.content]));
+  const aiBySlotId = Object.fromEntries(aiContents.map((a) => [a.slotId, a.content]));
 
   const entries = template.map((entry) => {
-    const key = entryKey(entry);
+    const slotId = buildPromptSlotId(
+      modelSlug,
+      phase,
+      entry.page,
+      entry.display_order,
+    );
     if (entry.type === "ai") {
-      return { ...entry, entry_key: key, id: key, content: aiByKey[key] ?? "" };
-    }
-    if (entry.type === "computed") {
-      const id = entry.id ?? key;
       return {
         ...entry,
-        entry_key: key,
-        id: key,
-        content: computedMap[id] ?? computedMap[key] ?? entry.content ?? "",
+        entry_key: slotId,
+        id: slotId,
+        content: aiBySlotId[slotId] ?? "",
+      };
+    }
+    if (entry.type === "computed") {
+      const legacyId = entry.id ?? entry.entry_key ?? "";
+      return {
+        ...entry,
+        entry_key: slotId,
+        id: legacyId || slotId,
+        content: computedMap[legacyId] ?? entry.content ?? "",
       };
     }
     return {
       ...entry,
-      entry_key: key,
-      id: key,
+      entry_key: slotId,
+      id: slotId,
       content: entry.content ?? "",
     };
   });
@@ -179,7 +246,6 @@ export async function generateResultDeliverable(
   };
 }
 
-/** Report phase — uses DB report templates; falls back to result layout if empty */
 export async function generateReportDeliverable(
   modelId: string,
   userInput: UserFormInput,

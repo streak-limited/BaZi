@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       is_active: body.is_active ?? true,
       config: body.config,
       tag_ids: body.tag_ids,
+      tag_labels: body.tag_labels,
     });
     return NextResponse.json({ model });
   } catch (e) {

@@ -13,10 +13,9 @@ export async function POST(request: Request) {
     const modelId = String(body.modelId ?? "").trim();
     const phase = String(body.phase ?? "result") as PromptPhase;
     const row = await createPromptEntry(modelId, phase, {
-      entry_key: String(body.entry_key ?? ""),
-      page: body.page,
+      page: body.page ?? 1,
       display_order: body.display_order,
-      entry_type: body.entry_type ?? "ai",
+      entry_type: "ai",
       description: body.description,
       section: body.section,
       static_content: body.static_content,

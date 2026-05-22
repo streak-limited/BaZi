@@ -18,8 +18,8 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
   const [resultPrompts, reportPrompts] = await Promise.all([
-    listPromptEntries(id, "result", { activeOnly: false }),
-    listPromptEntries(id, "report", { activeOnly: false }),
+    listPromptEntries(id, "result", { activeOnly: false, aiOnly: true }),
+    listPromptEntries(id, "report", { activeOnly: false, aiOnly: true }),
   ]);
   return NextResponse.json({ model, resultPrompts, reportPrompts });
 }
@@ -40,6 +40,7 @@ export async function PATCH(
       is_active: body.is_active,
       config: body.config,
       tag_ids: body.tag_ids,
+      tag_labels: body.tag_labels,
     });
     return NextResponse.json({ model });
   } catch (e) {

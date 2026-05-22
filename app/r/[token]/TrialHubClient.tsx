@@ -26,6 +26,8 @@ export default function TrialHubClient({ token }: { token: string }) {
   const [data, setData] = useState<TrialApi | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const sessionId = searchParams.get("session_id");
+
   const load = useCallback(() => {
     return fetch(`/api/trials/${encodeURIComponent(token)}`)
       .then((r) => r.json())
@@ -36,6 +38,20 @@ export default function TrialHubClient({ token }: { token: string }) {
       });
   }, [token]);
 
+  const fulfillReport = useCallback(async () => {
+    const res = await fetch(
+      `/api/trials/${encodeURIComponent(token)}/fulfill-report`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: sessionId ?? undefined }),
+      },
+    );
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "無法載入報告");
+    return json;
+  }, [token, sessionId]);
+
   useEffect(() => {
     load().catch((e) =>
       setError(e instanceof Error ? e.message : "無法載入"),
@@ -44,11 +60,44 @@ export default function TrialHubClient({ token }: { token: string }) {
 
   const status = data?.trial.status ?? "";
   const dels = data?.deliverables as Record<string, unknown> | undefined;
-  const hasReport = Boolean(dels?.report ?? dels?.full_report);
+  const reportDel =
+    dels?.report ??
+    dels?.full_report ??
+    (dels && typeof dels === "object"
+      ? Object.values(dels).find(
+          (d) =>
+            d &&
+            typeof d === "object" &&
+            ((d as { phase?: string }).phase === "report" ||
+              (d as { phase?: string }).phase === "full_report"),
+        )
+      : undefined);
+  const hasReport = Boolean(reportDel);
+  const reportFailed = status === "failed";
   const reportReady = hasReport || status === "completed";
-  const reportGenerating =
-    status === "report_generating" ||
-    (justPaid && !reportReady && status !== "failed");
+  const needsFulfill =
+    !reportReady &&
+    !reportFailed &&
+    (status === "paid" || status === "report_generating");
+  const reportGenerating = needsFulfill;
+
+  useEffect(() => {
+    if (!needsFulfill) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        await fulfillReport();
+        if (!cancelled) await load();
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "報告載入失敗");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [needsFulfill, fulfillReport, load]);
 
   useEffect(() => {
     if (!reportGenerating) return;
@@ -74,18 +123,39 @@ export default function TrialHubClient({ token }: { token: string }) {
           </div>
 
           <p className={styles.sub}>
-            {name}，多謝你的訂閱。完整 <strong>Report（20 頁）</strong>
-            正在生成中。
+            {name}，多謝你的訂閱。
+            {isDemo ? (
+              <>
+                {" "}
+                正在載入 <strong>Demo 完整報告（20 頁樣本）</strong>
+                — 使用預先準備的示範資料，不會呼叫 AI。
+              </>
+            ) : (
+              <>
+                {" "}
+                完整 <strong>Report（20 頁）</strong> 正在準備中。
+              </>
+            )}
           </p>
 
           {error && <div className={styles.error}>{error}</div>}
 
+          {reportFailed && (
+            <div className={styles.error}>
+              報告載入失敗。請重新整理，或使用「測試解鎖」再試。
+            </div>
+          )}
+
           {reportGenerating && !reportReady && (
             <div className={`${styles.card} ${styles.cardGenerating}`}>
               <div className={styles.spinner} />
-              <p className={styles.generatingTitle}>Report 生成中…</p>
+              <p className={styles.generatingTitle}>
+                {isDemo ? "載入 Demo 報告中…" : "Report 準備中…"}
+              </p>
               <p className={styles.generatingSub}>
-                通常需要數十秒至數分鐘。完成後會自動更新此頁，並
+                {isDemo
+                  ? "約數秒內完成。完成後會自動更新此頁，並"
+                  : "通常需要數十秒至數分鐘。完成後會自動更新此頁，並"}
                 {email ? (
                   <>
                     {" "}

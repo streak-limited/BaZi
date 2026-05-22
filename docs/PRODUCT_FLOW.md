@@ -49,6 +49,19 @@ Apply renames + tags: `007_rename_models_and_tags.sql` (after 001–006).
 { "trial_id": "uuid", "model_id": "bazi_full", "public_token": "..." }
 ```
 
+## Stripe webhook (required for real payments)
+
+| Step | Action |
+|------|--------|
+| **Local** | Terminal 1: `npm run dev` · Terminal 2: `npm run stripe:webhook` |
+| **Env** | Copy `whsec_…` from CLI into `STRIPE_WEBHOOK_SECRET`, restart dev |
+| **Event** | `checkout.session.completed` → `POST /api/stripe/webhook` |
+| **Handler** | `markPaymentSucceeded` + `fulfillReportAfterPayment` (demo or live AI) |
+| **Prod** | Dashboard → Webhooks → `https://YOUR_DOMAIN/api/stripe/webhook` |
+| **Fallback** | Hub `POST /api/trials/{token}/fulfill-report` if user returns before webhook |
+
+Without the webhook (and without `stripe listen` locally), payment succeeds in Stripe but the server never marks the trial paid or saves the report unless the user hits the success-page fallback.
+
 ## Adding a new model
 
 1. Insert `models` row + `model_tags` links in Supabase.

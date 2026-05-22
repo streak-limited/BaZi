@@ -1,8 +1,9 @@
 "use client";
 
 import type { ProductModel } from "@/lib/products/model-store";
+import { buildPromptSlotId } from "@/lib/products/prompt-slot-id";
 import type { ModelPromptEntryRow, PromptPhase } from "@/lib/products/prompt-types";
-import type { ProductTag } from "@/lib/products/types";
+import { ListingImageUpload } from "@/components/admin/ListingImageUpload";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -13,8 +14,18 @@ type Props = {
   model?: ProductModel;
   resultPrompts?: ModelPromptEntryRow[];
   reportPrompts?: ModelPromptEntryRow[];
-  allTags: ProductTag[];
 };
+
+function parseTagLabels(text: string): string[] {
+  return [
+    ...new Set(
+      text
+        .split(/[,，、]/)
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
 
 type PhaseTab = PromptPhase;
 
@@ -29,7 +40,6 @@ export function ModelEditorClient({
   model,
   resultPrompts: initialResult = [],
   reportPrompts: initialReport = [],
-  allTags,
 }: Props) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -51,8 +61,8 @@ export function ModelEditorClient({
     model?.config.price_hkd != null ? String(model.config.price_hkd) : "",
   );
   const [uiKey, setUiKey] = useState(model?.config.ui_key ?? "bazi_full");
-  const [tagIds, setTagIds] = useState<string[]>(
-    model?.tags.map((t) => t.id) ?? [],
+  const [tagLabelsText, setTagLabelsText] = useState(
+    model?.tags.map((t) => t.label).join(", ") ?? "",
   );
 
   const [resultPrompts, setResultPrompts] =
@@ -89,7 +99,7 @@ export function ModelEditorClient({
               family,
               is_active: isActive,
               config,
-              tag_ids: tagIds,
+              tag_labels: parseTagLabels(tagLabelsText),
             }),
           }),
         );
@@ -106,7 +116,7 @@ export function ModelEditorClient({
               family,
               is_active: isActive,
               config,
-              tag_ids: tagIds,
+              tag_labels: parseTagLabels(tagLabelsText),
             }),
           }),
         );
@@ -129,7 +139,7 @@ export function ModelEditorClient({
     listingDesc,
     priceHkd,
     uiKey,
-    tagIds,
+    tagLabelsText,
     router,
   ]);
 
@@ -147,7 +157,11 @@ export function ModelEditorClient({
         await fetch(`/api/admin/models/${model.id}`),
       );
       setResultPrompts(refreshed.resultPrompts ?? []);
-      alert(`Imported ${data.count} result entries`);
+      setReportPrompts(refreshed.reportPrompts ?? []);
+      if ((data.reportCount ?? 0) > 0) setPhase("report");
+      alert(
+        `Imported ${data.count} result + ${data.reportCount ?? 0} report AI prompts`,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Import failed");
     } finally {
@@ -196,18 +210,14 @@ export function ModelEditorClient({
   };
 
   const addPrompt = async (form: {
-    entry_key: string;
-    entry_type: string;
+    page: number;
+    slotId: number;
     description: string;
   }) => {
     if (!model) return;
     setSaving(true);
     setError(null);
     try {
-      const maxOrder = prompts.reduce(
-        (m, p) => Math.max(m, p.display_order),
-        0,
-      );
       const { entry } = await readJson(
         await fetch("/api/admin/prompts", {
           method: "POST",
@@ -215,16 +225,17 @@ export function ModelEditorClient({
           body: JSON.stringify({
             modelId: model.id,
             phase,
-            entry_key: form.entry_key.trim(),
-            entry_type: form.entry_type,
+            entry_type: "ai",
             description: form.description,
-            display_order: maxOrder + 10,
-            page: 1,
+            page: form.page,
+            display_order: form.slotId,
             is_active: true,
           }),
         }),
       );
-      setPrompts((list) => [...list, entry].sort((a, b) => a.display_order - b.display_order));
+      setPrompts((list) =>
+        [...list, entry].sort((a, b) => a.display_order - b.display_order),
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Add failed");
     } finally {
@@ -232,12 +243,29 @@ export function ModelEditorClient({
     }
   };
 
-  const toggleTag = (tagId: string) => {
-    setTagIds((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((t) => t !== tagId)
-        : [...prev, tagId],
-    );
+  const copyResultToReport = async () => {
+    if (!model) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const data = await readJson(
+        await fetch(`/api/admin/models/${model.id}/copy-prompts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ from: "result", to: "report" }),
+        }),
+      );
+      const refreshed = await readJson(
+        await fetch(`/api/admin/models/${model.id}`),
+      );
+      setReportPrompts(refreshed.reportPrompts ?? []);
+      setPhase("report");
+      alert(`Copied ${data.count} prompts to Report phase`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Copy failed");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -318,14 +346,15 @@ export function ModelEditorClient({
               onChange={(e) => setPriceHkd(e.target.value)}
             />
           </label>
-          <label className={styles.field}>
-            <span>Listing image URL</span>
-            <input
-              className={styles.input}
+          <div className={styles.fieldWide}>
+            <ListingImageUpload
               value={listingImage}
-              onChange={(e) => setListingImage(e.target.value)}
+              onChange={setListingImage}
+              modelId={mode === "edit" ? model?.id : undefined}
+              slug={slug || id}
+              disabled={saving}
             />
-          </label>
+          </div>
           <label className={styles.fieldWide}>
             <span>Listing description</span>
             <textarea
@@ -345,75 +374,93 @@ export function ModelEditorClient({
           </label>
         </div>
 
-        <h3 className={styles.subHeading}>Tags</h3>
-        <div className={styles.tagRow}>
-          {allTags.length === 0 ? (
-            <span className={styles.muted}>No tags in DB — run migration 007</span>
-          ) : (
-            allTags.map((t) => (
-              <label key={t.id} className={styles.tagChip}>
-                <input
-                  type="checkbox"
-                  checked={tagIds.includes(t.id)}
-                  onChange={() => toggleTag(t.id)}
-                />
-                {t.label}
-              </label>
-            ))
-          )}
-        </div>
+        <label className={styles.fieldWide}>
+          <span>Tags (home page filters)</span>
+          <input
+            className={styles.input}
+            value={tagLabelsText}
+            onChange={(e) => setTagLabelsText(e.target.value)}
+            placeholder="戀愛, 財運, 合婚 — comma separated"
+          />
+          <span className={styles.muted}>
+            Type any labels; new tags are created when you save the model.
+          </span>
+        </label>
       </section>
 
       {mode === "edit" && model && (
         <section className={styles.section}>
           <div className={styles.tabRow}>
-            <h2>Prompt entries</h2>
+            <h2>AI prompts</h2>
             <div className={styles.tabs}>
               <button
                 type="button"
                 className={phase === "result" ? styles.tabActive : styles.tab}
                 onClick={() => setPhase("result")}
               >
-                Result ({resultPrompts.length})
+                Result phase ({resultPrompts.length})
               </button>
               <button
                 type="button"
                 className={phase === "report" ? styles.tabActive : styles.tab}
                 onClick={() => setPhase("report")}
               >
-                Report ({reportPrompts.length})
+                Report phase ({reportPrompts.length})
               </button>
             </div>
           </div>
           <p className={styles.muted}>
-            Each row has a stable <code>entry_key</code> — use{" "}
-            <code>entryByKey(entries, &quot;pre-ai-narrative-1&quot;)</code> in
-            components. AI rows store the prompt template; generation writes
-            content into deliverables keyed by <code>entry_key</code>.
+            <strong>Result</strong> = 5 AI slots from{" "}
+            <code>pre-report-analysis.json</code> (payment teaser).{" "}
+            <strong>Report</strong> = 35 AI slots from{" "}
+            <code>ai_generated_content.json</code> (20-page report; demo still
+            uses sample JSON until live AI). Import defaults loads both. Each
+            slot uses{" "}
+            <code>page</code> + <code>slot id</code> →{" "}
+            <code>{slug}-{phase}-1-1</code>. Render order is hardcoded in the
+            app UI, not in CMS.
           </p>
-          {phase === "result" && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
             <button
               type="button"
               className={styles.secondaryBtn}
               disabled={saving}
               onClick={() => void importDefaultResult()}
             >
-              Import default result layout (from code)
+              Import defaults (5 result + 35 report)
             </button>
-          )}
+            {resultPrompts.length > 0 && reportPrompts.length === 0 && (
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                disabled={saving}
+                onClick={() => void copyResultToReport()}
+              >
+                Copy result → report ({resultPrompts.length})
+              </button>
+            )}
+          </div>
 
-          <PromptAddForm onAdd={(f) => void addPrompt(f)} />
+          <PromptAddForm
+            modelSlug={slug}
+            phase={phase}
+            nextSlotId={
+              prompts.reduce((m, p) => Math.max(m, p.display_order), 0) + 1
+            }
+            onAdd={(f) => void addPrompt(f)}
+          />
 
           <div className={styles.promptList}>
             {prompts.length === 0 ? (
               <p className={styles.muted}>
-                No {phase} prompts yet. Import default (result) or add entries.
+                No {phase} AI prompts yet. Import defaults or add a slot.
               </p>
             ) : (
               prompts.map((row) => (
                 <PromptEntryCard
                   key={row.id}
                   row={row}
+                  modelSlug={slug}
                   disabled={saving}
                   onSave={(patch) => void updatePrompt(row.id, patch)}
                   onDelete={() => void deletePrompt(row.id)}
@@ -428,52 +475,60 @@ export function ModelEditorClient({
 }
 
 function PromptAddForm({
+  modelSlug,
+  phase,
+  nextSlotId,
   onAdd,
 }: {
-  onAdd: (f: {
-    entry_key: string;
-    entry_type: string;
-    description: string;
-  }) => void;
+  modelSlug: string;
+  phase: PromptPhase;
+  nextSlotId: number;
+  onAdd: (f: { page: number; slotId: number; description: string }) => void;
 }) {
-  const [entryKey, setEntryKey] = useState("");
-  const [entryType, setEntryType] = useState("ai");
+  const [page, setPage] = useState(1);
+  const [slotId, setSlotId] = useState(nextSlotId);
   const [description, setDescription] = useState("");
+  const previewId = buildPromptSlotId(modelSlug, phase, page, slotId);
 
   return (
     <div className={styles.addPromptBar}>
       <input
         className={styles.input}
-        placeholder="entry_key e.g. pre-ai-narrative-1"
-        value={entryKey}
-        onChange={(e) => setEntryKey(e.target.value)}
+        type="number"
+        min={1}
+        placeholder="page"
+        value={page}
+        onChange={(e) => setPage(Number(e.target.value) || 1)}
+        title="Page"
       />
-      <select
-        className={styles.input}
-        value={entryType}
-        onChange={(e) => setEntryType(e.target.value)}
-      >
-        <option value="static">static</option>
-        <option value="computed">computed</option>
-        <option value="ai">ai</option>
-      </select>
       <input
         className={styles.input}
-        placeholder="description"
+        type="number"
+        min={1}
+        placeholder="id"
+        value={slotId}
+        onChange={(e) => setSlotId(Number(e.target.value) || 1)}
+        title="Slot id"
+      />
+      <input
+        className={styles.input}
+        placeholder="label / description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
+      <span className={styles.muted} style={{ fontSize: "0.75rem" }}>
+        → <code>{previewId}</code>
+      </span>
       <button
         type="button"
         className={styles.primaryBtn}
         onClick={() => {
-          if (!entryKey.trim()) return;
-          onAdd({ entry_key: entryKey, entry_type: entryType, description });
-          setEntryKey("");
+          onAdd({ page, slotId, description });
           setDescription("");
+          setSlotId(slotId + 1);
         }}
       >
-        Add entry
+        Add AI prompt
       </button>
     </div>
   );
@@ -481,102 +536,76 @@ function PromptAddForm({
 
 function PromptEntryCard({
   row,
+  modelSlug,
   disabled,
   onSave,
   onDelete,
 }: {
   row: ModelPromptEntryRow;
+  modelSlug: string;
   disabled: boolean;
   onSave: (patch: Partial<ModelPromptEntryRow>) => void;
   onDelete: () => void;
 }) {
   const [draft, setDraft] = useState(row);
+  const cmsSlotId = draft.display_order;
+  const entryKey = buildPromptSlotId(
+    modelSlug,
+    row.phase,
+    draft.page,
+    cmsSlotId,
+  );
   const dirty =
-    draft.entry_key !== row.entry_key ||
     draft.description !== row.description ||
-    draft.section !== row.section ||
     draft.page !== row.page ||
-    draft.display_order !== row.display_order ||
-    draft.entry_type !== row.entry_type ||
-    draft.static_content !== row.static_content ||
+    cmsSlotId !== row.display_order ||
     draft.prompt_template !== row.prompt_template ||
     draft.is_active !== row.is_active ||
     draft.length_min !== row.length_min ||
     draft.length_max !== row.length_max;
 
   return (
-    <details className={styles.promptCard} open={row.entry_type === "ai"}>
+    <details className={styles.promptCard} open>
       <summary>
-        <code>{row.entry_key}</code>
-        <span className={styles.badge}>{row.entry_type}</span>
-        <span className={styles.muted}>p{row.page} · #{row.display_order}</span>
+        <span className={styles.badge}>
+          p{row.page} · id {row.display_order}
+        </span>
+        <span className={styles.muted}>{row.description || "AI slot"}</span>
         {!row.is_active && <span className={styles.badge}>inactive</span>}
       </summary>
+      <p className={styles.muted} style={{ margin: "0 0 12px", fontSize: "0.8rem" }}>
+        Key: <code>{entryKey}</code>
+      </p>
       <div className={styles.formGrid}>
-        <label className={styles.field}>
-          <span>entry_key</span>
-          <input
-            className={styles.input}
-            value={draft.entry_key}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, entry_key: e.target.value }))
-            }
-          />
-        </label>
-        <label className={styles.field}>
-          <span>type</span>
-          <select
-            className={styles.input}
-            value={draft.entry_type}
-            onChange={(e) =>
-              setDraft((d) => ({
-                ...d,
-                entry_type: e.target.value as ModelPromptEntryRow["entry_type"],
-              }))
-            }
-          >
-            <option value="static">static</option>
-            <option value="computed">computed</option>
-            <option value="ai">ai</option>
-          </select>
-        </label>
         <label className={styles.field}>
           <span>page</span>
           <input
             className={styles.input}
             type="number"
+            min={1}
             value={draft.page}
             onChange={(e) =>
-              setDraft((d) => ({ ...d, page: Number(e.target.value) }))
+              setDraft((d) => ({ ...d, page: Number(e.target.value) || 1 }))
             }
           />
         </label>
         <label className={styles.field}>
-          <span>display_order</span>
+          <span>Slot id</span>
           <input
             className={styles.input}
             type="number"
+            min={1}
             value={draft.display_order}
             onChange={(e) =>
               setDraft((d) => ({
                 ...d,
-                display_order: Number(e.target.value),
+                display_order: Number(e.target.value) || 1,
               }))
             }
           />
         </label>
-        <label className={styles.field}>
-          <span>section</span>
-          <input
-            className={styles.input}
-            value={draft.section ?? ""}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, section: e.target.value || null }))
-            }
-          />
-        </label>
         <label className={styles.fieldWide}>
-          <span>description</span>
+          <span>label</span>
           <input
             className={styles.input}
             value={draft.description}
@@ -585,68 +614,48 @@ function PromptEntryCard({
             }
           />
         </label>
-        {draft.entry_type !== "ai" && (
-          <label className={styles.fieldWide}>
-            <span>static_content</span>
-            <textarea
-              className={styles.textarea}
-              rows={3}
-              value={draft.static_content ?? ""}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  static_content: e.target.value || null,
-                }))
-              }
-            />
-          </label>
-        )}
-        {draft.entry_type === "ai" && (
-          <>
-            <label className={styles.field}>
-              <span>length_min</span>
-              <input
-                className={styles.input}
-                type="number"
-                value={draft.length_min ?? ""}
-                onChange={(e) =>
-                  setDraft((d) => ({
-                    ...d,
-                    length_min: e.target.value ? Number(e.target.value) : null,
-                  }))
-                }
-              />
-            </label>
-            <label className={styles.field}>
-              <span>length_max</span>
-              <input
-                className={styles.input}
-                type="number"
-                value={draft.length_max ?? ""}
-                onChange={(e) =>
-                  setDraft((d) => ({
-                    ...d,
-                    length_max: e.target.value ? Number(e.target.value) : null,
-                  }))
-                }
-              />
-            </label>
-            <label className={styles.fieldWide}>
-              <span>prompt_template</span>
-              <textarea
-                className={styles.textarea}
-                rows={8}
-                value={draft.prompt_template ?? ""}
-                onChange={(e) =>
-                  setDraft((d) => ({
-                    ...d,
-                    prompt_template: e.target.value || null,
-                  }))
-                }
-              />
-            </label>
-          </>
-        )}
+        <label className={styles.field}>
+          <span>length_min</span>
+          <input
+            className={styles.input}
+            type="number"
+            value={draft.length_min ?? ""}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                length_min: e.target.value ? Number(e.target.value) : null,
+              }))
+            }
+          />
+        </label>
+        <label className={styles.field}>
+          <span>length_max</span>
+          <input
+            className={styles.input}
+            type="number"
+            value={draft.length_max ?? ""}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                length_max: e.target.value ? Number(e.target.value) : null,
+              }))
+            }
+          />
+        </label>
+        <label className={styles.fieldWide}>
+          <span>prompt_template</span>
+          <textarea
+            className={styles.textarea}
+            rows={10}
+            value={draft.prompt_template ?? ""}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                prompt_template: e.target.value || null,
+              }))
+            }
+          />
+        </label>
         <label className={styles.checkRow}>
           <input
             type="checkbox"
@@ -665,13 +674,10 @@ function PromptEntryCard({
           disabled={disabled || !dirty}
           onClick={() =>
             onSave({
-              entry_key: draft.entry_key,
-              entry_type: draft.entry_type,
+              entry_type: "ai",
               description: draft.description,
-              section: draft.section,
               page: draft.page,
               display_order: draft.display_order,
-              static_content: draft.static_content,
               prompt_template: draft.prompt_template,
               length_min: draft.length_min,
               length_max: draft.length_max,
@@ -679,7 +685,7 @@ function PromptEntryCard({
             })
           }
         >
-          Save entry
+          Save prompt
         </button>
         <button
           type="button"

@@ -16,7 +16,9 @@
     "db:migrate:dummy-images": "node scripts/apply-sql-migrations.mjs 006_dummy_listing_images.sql",
     "db:migrate:models": "node scripts/apply-sql-migrations.mjs 007_rename_models_and_tags.sql",
     "db:migrate:prompts": "node scripts/apply-sql-migrations.mjs 008_model_prompt_entries.sql",
-    "db:seed:prompts": "node scripts/seed-model-prompt-entries.mjs",
+    "db:migrate:prompt-slots": "node scripts/apply-sql-migrations.mjs 009_prompt_slot_position_unique.sql",
+    "db:seed:prompts": "npx tsx scripts/import-result-prompts.ts",
+    "stripe:webhook": "bash scripts/stripe-webhook-dev.sh",
     "db:migrate:check": "node scripts/check-supabase-tables.mjs"
   },
   "dependencies": {

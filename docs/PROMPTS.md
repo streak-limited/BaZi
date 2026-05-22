@@ -1,40 +1,35 @@
 # AI prompt management
 
-Prompts for the **result** (payment teaser) and **report** (full deliverable) phases live in Supabase, not only in TypeScript files.
+Only **AI** prompt templates are stored in Supabase and edited in admin. Static copy, images, and layout are **hardcoded** in the app.
 
-## Where prompts live
+## Where content lives
 
 | Layer | Purpose |
 |-------|---------|
-| `model_prompt_entries` (Supabase) | Source of truth: layout slots, `entry_key`, AI `prompt_template`, static copy |
-| `lib/pre-report-prompts.ts` | Legacy fallback when DB has no rows |
-| `refereence/pre-report-analysis.json` | Legacy layout fallback for result phase |
+| `model_prompt_entries` (Supabase, `entry_type = ai`) | AI `prompt_template` per `entry_key` |
+| `lib/bazi-journey/result-page-static.ts` | Result page static + computed slot layout (from JSON, not CMS) |
+| `app/bazi/intro/ResultView.tsx` | Renders static from `RESULT_PAGE_STATIC`; AI text from deliverable by `entry_key` |
+| `lib/pre-report-prompts.ts` | Fallback AI prompts when DB row missing |
 
-Generation reads DB first (`lib/products/generate-deliverable.ts`), then falls back to code.
+Generation merges code layout + DB AI prompts (`lib/products/generate-deliverable.ts`).
 
-## Stable identifiers
+## Slot identifiers (auto-generated)
 
-Each row has:
+Admins set **`page`** + **`display_order`** only. The system derives:
 
-- **`entry_key`** — stable id used in deliverables and UI, e.g. `pre-ai-narrative-1`
-- **`phase`** — `result` or `report`
-- **`entry_type`** — `static` | `computed` | `ai`
+`{model-slug}-{result|report}-{page}-{order}` → e.g. `bazi-full-report-result-1-40`
 
-After generation, each deliverable entry keeps `entry_key` (and `id` alias). Use helpers in `lib/report/entries.ts`:
+Unique in DB: `(model_id, phase, page, display_order)`.
 
-```ts
-import { entryByKey, entryContentByKey } from "@/lib/report/entries";
-
-const text = entryContentByKey(entries, "pre-ai-narrative-1");
-```
+**ResultView** renders AI blocks by sorting `type === "ai"` entries on page/order — no manual ids in components.
 
 ## Admin
 
 1. Set `ADMIN_SECRET` in `.env.local`
 2. Open `/admin/models`
 3. Edit a model: slug, title, listing image, tags, price
-4. **Result / Report** tabs: edit, add, remove prompt rows
-5. **Import default result layout** — copies from `pre-report-analysis.json` + `pre-report-prompts.ts`
+4. **Result / Report** tabs: edit, add, remove **AI** prompt rows only
+5. **Import default AI prompts** — 5 result slots + full prompt text from code
 
 API routes (cookie auth): `/api/admin/models`, `/api/admin/prompts`, seed: `POST /api/admin/models/{id}/seed-result`
 
@@ -42,7 +37,7 @@ API routes (cookie auth): `/api/admin/models`, `/api/admin/prompts`, seed: `POST
 
 ```bash
 npm run db:migrate:prompts    # 008_model_prompt_entries.sql
-npm run db:seed:prompts       # optional CLI seed (structure only; use Admin import for full prompts)
+npx tsx scripts/import-result-prompts.ts   # AI prompts only; removes non-AI rows
 ```
 
 Or paste `supabase/migrations/008_model_prompt_entries.sql` in Supabase SQL Editor.

@@ -342,3 +342,71 @@
   text-decoration: none;
   text-align: center;
 }
+
+.listingUpload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.listingUploadLabel {
+  font-size: 0.8rem;
+  color: #9aa0a6;
+}
+
+.listingDropzone {
+  border: 1px dashed #4a5160;
+  border-radius: 10px;
+  background: #14171c;
+  color: #c4c7cc;
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.listingDropzone:hover:not(:disabled) {
+  border-color: #6b7280;
+  background: #1a1d24;
+}
+
+.listingDropzone:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.listingPreviewWrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.listingPreview {
+  width: 160px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #2a2f3a;
+  background: #0f1115;
+}
+
+.listingPreviewActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hiddenFile {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadError {
+  color: #f28b82;
+  font-size: 0.8rem;
+  margin: 0;
+}

@@ -1,7 +1,16 @@
 import ReportReader from "@/app/r/[token]/report/ReportReader";
 import { buildDemoReportDeliverable } from "@/lib/report-demo";
+import {
+  completeReportGeneration,
+  completeReportGenerationForDemoUnlock,
+  isDemoReportMode,
+} from "@/lib/products/report-generation";
 import type { ReportDeliverable } from "@/lib/products/types";
-import { isSupabaseConfigured, loadTrialBundle } from "@/lib/products/trial-store";
+import {
+  getTrialByToken,
+  isSupabaseConfigured,
+  loadTrialBundle,
+} from "@/lib/products/trial-store";
 import Link from "next/link";
 import styles from "../r.module.css";
 
@@ -35,14 +44,42 @@ export default async function SharedReportPage({
     );
   }
 
-  const legacy = bundle.deliverables as Record<string, { content?: unknown }>;
-  const raw =
-    bundle.deliverables.report?.content ?? legacy.full_report?.content;
-
   const legacyDels = bundle.deliverables as Record<string, unknown>;
-  const hasReportDeliverable = Boolean(
+  let hasReportDeliverable = Boolean(
     bundle.deliverables.report ?? legacyDels.full_report,
   );
+
+  const canTryGenerate =
+    !hasReportDeliverable &&
+    (bundle.trial.status === "paid" ||
+      bundle.trial.status === "report_generating" ||
+      bundle.trial.stripe_payment_status === "demo");
+
+  if (canTryGenerate) {
+    const trial = await getTrialByToken(token);
+    if (trial) {
+      try {
+        if (isDemoReportMode()) {
+          await completeReportGenerationForDemoUnlock(trial.id);
+        } else {
+          await completeReportGeneration(trial.id);
+        }
+        const refreshed = await loadTrialBundle(token);
+        if (refreshed) {
+          hasReportDeliverable = Boolean(
+            refreshed.deliverables.report ??
+              (refreshed.deliverables as Record<string, unknown>).full_report,
+          );
+          if (hasReportDeliverable) {
+            Object.assign(bundle, refreshed);
+          }
+        }
+      } catch {
+        /* show generating UI below */
+      }
+    }
+  }
+
   const canAccess =
     bundle.trial.status === "completed" || hasReportDeliverable;
 
@@ -64,6 +101,10 @@ export default async function SharedReportPage({
       </div>
     );
   }
+
+  const legacy = bundle.deliverables as Record<string, { content?: unknown }>;
+  const raw =
+    bundle.deliverables.report?.content ?? legacy.full_report?.content;
 
   let deliverable: ReportDeliverable;
   let isDemo = false;

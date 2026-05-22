@@ -1,14 +1,14 @@
 "use client";
 
-import { groupEntriesBySection } from "@/lib/bazi-journey/build-result";
+import { aiEntryForSlot, RESULT_AI_UI_SLOTS } from "@/lib/bazi-journey/result-ai-slots";
+import { RESULT_PAGE_STATIC } from "@/lib/bazi-journey/result-page-static";
 import type { ResultPayload } from "@/lib/bazi-journey/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./bazi-intro.module.css";
 
-const TEASER_BASE =
-  "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser";
+const S = RESULT_PAGE_STATIC;
 
 interface StripeUiConfig {
   enabled: boolean;
@@ -22,14 +22,6 @@ interface ResultViewProps {
   subjectId?: string | null;
   /** When set, checkout + saved deliverables use Supabase trial */
   publicToken?: string | null;
-}
-
-function pickImage(
-  entries: ResultPayload["entries"],
-  description: string,
-): string | null {
-  const e = entries.find((x) => x.description === description);
-  return e?.image_url ?? null;
 }
 
 export default function ResultView({
@@ -56,28 +48,24 @@ export default function ResultView({
       );
   }, []);
 
-  const grouped = groupEntriesBySection(payload.entries);
-  const heroUrl =
-    grouped.get("hero_video")?.[0]?.content ??
-    `${TEASER_BASE}/mzmudang_teaser_sales_video.mp4`;
-  const intro = grouped.get("intro") ?? [];
-  const pillars = grouped.get("four_pillars")?.[0]?.content ?? "";
-  const name = grouped.get("name_display")?.[0]?.content ?? "命主";
-  const tags = (grouped.get("personality_tags") ?? []).map((e) => e.content);
-  const worry = grouped.get("worry_dialogue") ?? [];
-  const narratives = grouped.get("fortune_narrative") ?? [];
-  const flower = grouped.get("flower_mirror") ?? [];
-  const money = grouped.get("money_teaser") ?? [];
-  const expert = grouped.get("expert_card") ?? [];
-  const cta = grouped.get("cta")?.[0]?.content ?? "向韓國範山道令算命";
+  const pillars =
+    payload.entries.find(
+      (e) => e.type === "computed" && e.section === "four_pillars",
+    )?.content ?? "";
+  const name =
+    payload.entries.find(
+      (e) => e.type === "computed" && e.section === "name_display",
+    )?.content ?? "命主";
 
-  const worryBg =
-    pickImage(payload.entries, "煩惱對話背景圖") ??
-    `${TEASER_BASE}/04_worry_bg.png`;
-  const palzaBg = `${TEASER_BASE}/05_palza_bg.png`;
-  const expertBg =
-    pickImage(payload.entries, "大師區背景") ??
-    `${TEASER_BASE}/20_price_character.png`;
+  const narratives = RESULT_AI_UI_SLOTS.map(({ page, slotId }) => ({
+    id: `ai-${page}-${slotId}`,
+    content: aiEntryForSlot(payload.entries, page, slotId),
+  })).filter((n) => n.content);
+
+  const worryLines = S.worry.filter((e) => e.content && !e.image_url);
+  const money = S.money;
+  const expert = S.expert;
+  const flower = S.flower;
 
   const stripeReady = stripe?.enabled ?? false;
   const priceLabel = stripe?.priceLabel ?? "解鎖完整報告";
@@ -141,7 +129,7 @@ export default function ResultView({
         <section className={styles.section}>
           <video
             className={styles.heroVideo}
-            src={heroUrl}
+            src={S.heroVideo}
             autoPlay
             muted
             playsInline
@@ -151,13 +139,9 @@ export default function ResultView({
         </section>
 
         <section className={`${styles.section} ${styles.introBlock}`}>
-          <img
-            className={styles.introBg}
-            src={`${TEASER_BASE}/03_intro_bg.png`}
-            alt=""
-          />
+          <img className={styles.introBg} src={S.introBg} alt="" />
           <div className={styles.introLines}>
-            {intro.map((line) => (
+            {S.intro.map((line) => (
               <p
                 key={line.id}
                 className={
@@ -179,7 +163,7 @@ export default function ResultView({
 
         <section className={styles.section}>
           <div className={styles.tagRow}>
-            {tags.map((t) => (
+            {S.personalityTags.map((t) => (
               <span key={t} className={styles.tag}>
                 {t}
               </span>
@@ -188,11 +172,14 @@ export default function ResultView({
         </section>
 
         <section className={`${styles.section} ${styles.worrySection}`}>
-          <img className={styles.worryBg} src={worryBg} alt="" />
+          <img className={styles.worryBg} src={S.worryBg} alt="" />
           <div className={styles.worryOverlay} />
           <div className={styles.worryContent}>
-            {worry.map((line) => (
-              <p key={line.id} style={{ marginBottom: 12, fontSize: "1.1rem" }}>
+            {worryLines.map((line) => (
+              <p
+                key={line.id}
+                style={{ marginBottom: 12, fontSize: "1.1rem" }}
+              >
                 {line.content}
               </p>
             ))}
@@ -205,7 +192,7 @@ export default function ResultView({
             className={`${styles.section} ${styles.narrativeSection}`}
           >
             {i === 0 && (
-              <img className={styles.narrativeBg} src={palzaBg} alt="" />
+              <img className={styles.narrativeBg} src={S.palzaBg} alt="" />
             )}
             <div className={styles.bubble}>{block.content}</div>
           </section>
@@ -251,7 +238,7 @@ export default function ResultView({
         </section>
 
         <section className={`${styles.section} ${styles.expertSection}`}>
-          <img className={styles.expertBg} src={expertBg} alt="" />
+          <img className={styles.expertBg} src={S.expertBg} alt="" />
           <div className={styles.expertOverlay} />
           <div className={styles.expertText}>
             {expert[0] && (
@@ -308,7 +295,7 @@ export default function ResultView({
             {payLoading
               ? "前往 Stripe Checkout…"
               : stripeReady
-                ? `${cta} · ${priceLabel}`
+                ? `${S.cta} · ${priceLabel}`
                 : "載入付款設定…"}
           </button>
           {stripe?.allowSkip && (

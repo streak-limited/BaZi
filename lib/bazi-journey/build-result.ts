@@ -3,7 +3,7 @@ import { generateResultPayload } from "@/lib/products/generate-deliverable";
 import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
 import type { UserFormInput } from "@/lib/user-input";
 
-/** Generate result page from model_prompt_entries (DB) with code fallback */
+/** Generate result: static layout in code + AI prompts from model_prompt_entries */
 export async function buildResult(
   input: UserFormInput,
   modelId: string = DEFAULT_BAZI_MODEL,

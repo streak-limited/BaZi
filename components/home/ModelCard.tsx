@@ -61,6 +61,15 @@ export default function ModelCard({
             <p className={styles.description}>{description}</p>
           ) : null}
           <div className={styles.meta}>
+            {model.tags.length > 0 ? (
+              <span className={styles.tagRow}>
+                {model.tags.map((t) => (
+                  <span key={t.id} className={styles.tagChip}>
+                    {t.label}
+                  </span>
+                ))}
+              </span>
+            ) : null}
             {listing.badge ? (
               <span className={styles.badge}>≡ {listing.badge}</span>
             ) : null}

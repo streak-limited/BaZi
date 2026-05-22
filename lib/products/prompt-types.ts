@@ -24,7 +24,8 @@ export interface ModelPromptEntryRow {
 }
 
 export type ModelPromptEntryInput = {
-  entry_key: string;
+  /** Auto-derived from model slug + phase + page + slot id (display_order column) if omitted */
+  entry_key?: string;
   page?: number;
   display_order?: number;
   entry_type: ContentType;

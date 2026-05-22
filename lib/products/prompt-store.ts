@@ -1,11 +1,11 @@
-import { promptRowToReportEntry } from "@/lib/report/entries";
+import { getModelById } from "@/lib/products/model-store";
+import { buildPromptSlotId } from "@/lib/products/prompt-slot-id";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/server";
 import type {
   ModelPromptEntryInput,
   ModelPromptEntryRow,
   PromptPhase,
 } from "@/lib/products/prompt-types";
-import type { ReportEntry } from "@/lib/report-types";
 
 function rowFromDb(r: Record<string, unknown>): ModelPromptEntryRow {
   return {
@@ -30,10 +30,26 @@ function rowFromDb(r: Record<string, unknown>): ModelPromptEntryRow {
   };
 }
 
+async function resolveModelSlug(modelId: string): Promise<string> {
+  const model = await getModelById(modelId);
+  if (!model?.slug) throw new Error(`Model not found: ${modelId}`);
+  return model.slug;
+}
+
+export async function derivePromptSlotId(
+  modelId: string,
+  phase: PromptPhase,
+  page: number,
+  displayOrder: number,
+): Promise<string> {
+  const slug = await resolveModelSlug(modelId);
+  return buildPromptSlotId(slug, phase, page, displayOrder);
+}
+
 export async function listPromptEntries(
   modelId: string,
   phase: PromptPhase,
-  opts?: { activeOnly?: boolean },
+  opts?: { activeOnly?: boolean; aiOnly?: boolean },
 ): Promise<ModelPromptEntryRow[]> {
   if (!isSupabaseConfigured()) return [];
   const db = getSupabaseAdmin();
@@ -42,7 +58,11 @@ export async function listPromptEntries(
     .select("*")
     .eq("model_id", modelId)
     .eq("phase", phase)
+    .order("page")
     .order("display_order");
+  if (opts?.aiOnly) {
+    q = q.eq("entry_type", "ai");
+  }
   if (opts?.activeOnly !== false) {
     q = q.eq("is_active", true);
   }
@@ -54,12 +74,29 @@ export async function listPromptEntries(
   return (data ?? []).map((r) => rowFromDb(r as Record<string, unknown>));
 }
 
-export async function getPromptTemplatesAsEntries(
+export async function listAiPromptEntries(
   modelId: string,
   phase: PromptPhase,
-): Promise<ReportEntry[]> {
-  const rows = await listPromptEntries(modelId, phase);
-  return rows.map(promptRowToReportEntry);
+  opts?: { activeOnly?: boolean },
+): Promise<ModelPromptEntryRow[]> {
+  return listPromptEntries(modelId, phase, { ...opts, aiOnly: true });
+}
+
+export async function deleteNonAiPromptEntries(
+  modelId: string,
+  phase?: PromptPhase,
+): Promise<number> {
+  const db = getSupabaseAdmin();
+  let q = db
+    .from("model_prompt_entries")
+    .delete()
+    .eq("model_id", modelId)
+    .neq("entry_type", "ai")
+    .select("id");
+  if (phase) q = q.eq("phase", phase);
+  const { data, error } = await q;
+  if (error) throw new Error(error.message);
+  return data?.length ?? 0;
 }
 
 export async function createPromptEntry(
@@ -67,16 +104,22 @@ export async function createPromptEntry(
   phase: PromptPhase,
   input: ModelPromptEntryInput,
 ): Promise<ModelPromptEntryRow> {
+  const page = input.page ?? 1;
+  const display_order = input.display_order ?? 0;
+  const entry_key =
+    input.entry_key?.trim() ||
+    (await derivePromptSlotId(modelId, phase, page, display_order));
+
   const db = getSupabaseAdmin();
   const { data, error } = await db
     .from("model_prompt_entries")
     .insert({
       model_id: modelId,
       phase,
-      entry_key: input.entry_key.trim(),
-      page: input.page ?? 1,
-      display_order: input.display_order ?? 0,
-      entry_type: input.entry_type,
+      entry_key,
+      page,
+      display_order,
+      entry_type: input.entry_type ?? "ai",
       description: input.description ?? "",
       section: input.section ?? null,
       static_content: input.static_content ?? null,
@@ -98,10 +141,24 @@ export async function updatePromptEntry(
   patch: Partial<ModelPromptEntryInput>,
 ): Promise<ModelPromptEntryRow> {
   const db = getSupabaseAdmin();
-  const body: Record<string, unknown> = {};
-  if (patch.entry_key !== undefined) body.entry_key = patch.entry_key.trim();
-  if (patch.page !== undefined) body.page = patch.page;
-  if (patch.display_order !== undefined) body.display_order = patch.display_order;
+  const { data: existing, error: loadErr } = await db
+    .from("model_prompt_entries")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (loadErr || !existing) throw new Error(loadErr?.message ?? "Not found");
+
+  const row = rowFromDb(existing as Record<string, unknown>);
+  const page = patch.page ?? row.page;
+  const display_order = patch.display_order ?? row.display_order;
+  const entry_key = await derivePromptSlotId(
+    row.model_id,
+    row.phase,
+    page,
+    display_order,
+  );
+
+  const body: Record<string, unknown> = { entry_key, page, display_order };
   if (patch.entry_type !== undefined) body.entry_type = patch.entry_type;
   if (patch.description !== undefined) body.description = patch.description;
   if (patch.section !== undefined) body.section = patch.section;
@@ -133,29 +190,38 @@ export async function upsertPromptEntriesBulk(
   modelId: string,
   phase: PromptPhase,
   entries: ModelPromptEntryInput[],
+  modelSlug?: string,
 ): Promise<number> {
   if (entries.length === 0) return 0;
+  const slug = modelSlug ?? (await resolveModelSlug(modelId));
   const db = getSupabaseAdmin();
-  const rows = entries.map((input) => ({
-    model_id: modelId,
-    phase,
-    entry_key: input.entry_key.trim(),
-    page: input.page ?? 1,
-    display_order: input.display_order ?? 0,
-    entry_type: input.entry_type,
-    description: input.description ?? "",
-    section: input.section ?? null,
-    static_content: input.static_content ?? null,
-    prompt_template: input.prompt_template ?? null,
-    image_url: input.image_url ?? null,
-    image_url_proxy: input.image_url_proxy ?? null,
-    length_min: input.length_min ?? null,
-    length_max: input.length_max ?? null,
-    is_active: input.is_active ?? true,
-  }));
-  const { error } = await db
-    .from("model_prompt_entries")
-    .upsert(rows, { onConflict: "model_id,phase,entry_key" });
+  const rows = entries.map((input) => {
+    const page = input.page ?? 1;
+    const display_order = input.display_order ?? 0;
+    const entry_key =
+      input.entry_key?.trim() ||
+      buildPromptSlotId(slug, phase, page, display_order);
+    return {
+      model_id: modelId,
+      phase,
+      entry_key,
+      page,
+      display_order,
+      entry_type: input.entry_type ?? "ai",
+      description: input.description ?? "",
+      section: input.section ?? null,
+      static_content: input.static_content ?? null,
+      prompt_template: input.prompt_template ?? null,
+      image_url: input.image_url ?? null,
+      image_url_proxy: input.image_url_proxy ?? null,
+      length_min: input.length_min ?? null,
+      length_max: input.length_max ?? null,
+      is_active: input.is_active ?? true,
+    };
+  });
+  const { error } = await db.from("model_prompt_entries").upsert(rows, {
+    onConflict: "model_id,phase,page,display_order",
+  });
   if (error) throw new Error(error.message);
   return rows.length;
 }

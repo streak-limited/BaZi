@@ -1,14 +1,19 @@
 #!/usr/bin/env npx tsx
 /**
- * Seed result prompts with full AI text (same as Admin → Import default)
+ * Import CMS AI prompts:
+ *   Result (5) ← pre-report-analysis.json
+ *   Report (35) ← ai_generated_content.json + lib/report-prompts.ts
  *   npx tsx scripts/import-result-prompts.ts [modelId]
  */
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
-import { getPreReportData } from "../lib/pre-report-data";
-import { PRE_REPORT_PROMPTS_BY_DESCRIPTION } from "../lib/pre-report-prompts";
+import {
+  buildReportDefaultSlots,
+  buildResultDefaultSlots,
+} from "../lib/products/prompt-defaults";
+import { buildPromptSlotId } from "../lib/products/prompt-slot-id";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -43,38 +48,61 @@ async function main() {
   }
 
   const db = createClient(url, key, { auth: { persistSession: false } });
-  const report = getPreReportData();
-  const rows = report.entries.map((e) => {
-    const entry_key = e.id || `p${e.page}-o${e.display_order}`;
-    return {
-      model_id: MODEL_ID,
-      phase: "result",
-      entry_key,
-      page: e.page,
-      display_order: e.display_order,
-      entry_type: e.type,
-      description: e.description ?? "",
-      section: e.section ?? null,
-      static_content: e.type !== "ai" ? (e.content ?? null) : null,
-      prompt_template:
-        e.type === "ai"
-          ? (e.prompt ?? PRE_REPORT_PROMPTS_BY_DESCRIPTION[e.description] ?? null)
-          : null,
-      image_url: e.image_url ?? null,
-      image_url_proxy: e.image_url_proxy ?? null,
-      is_active: true,
-    };
-  });
 
-  const { error } = await db
+  const { data: modelRow, error: modelErr } = await db
+    .from("models")
+    .select("id, slug")
+    .eq("id", MODEL_ID)
+    .single();
+  if (modelErr || !modelRow) {
+    console.error("Model not found:", MODEL_ID);
+    process.exit(1);
+  }
+  const slug = String(modelRow.slug);
+
+  await db
     .from("model_prompt_entries")
-    .upsert(rows, { onConflict: "model_id,phase,entry_key" });
+    .delete()
+    .eq("model_id", MODEL_ID)
+    .in("phase", ["result", "report"]);
+
+  const buildRows = (
+    phase: "result" | "report",
+    slots: ReturnType<typeof buildResultDefaultSlots>,
+  ) =>
+    slots.map((slot) => ({
+      model_id: MODEL_ID,
+      phase,
+      entry_key: buildPromptSlotId(slug, phase, slot.page, slot.slotId),
+      page: slot.page,
+      display_order: slot.slotId,
+      entry_type: "ai",
+      description: slot.description,
+      section: slot.section ?? null,
+      static_content: null,
+      prompt_template: slot.prompt,
+      is_active: true,
+    }));
+
+  const resultSlots = buildResultDefaultSlots();
+  const reportSlots = buildReportDefaultSlots();
+  const rows = [
+    ...buildRows("result", resultSlots),
+    ...buildRows("report", reportSlots),
+  ];
+
+  const { error } = await db.from("model_prompt_entries").upsert(rows, {
+    onConflict: "model_id,phase,page,display_order",
+  });
 
   if (error) {
     console.error(error.message);
     process.exit(1);
   }
-  console.log(`Imported ${rows.length} result prompt entries for ${MODEL_ID}`);
+  console.log(
+    `Imported ${resultSlots.length} result (pre-report-analysis.json) + ${reportSlots.length} report (ai_generated_content.json) for ${MODEL_ID} (${slug})`,
+  );
+  rows.forEach((r) => console.log(`  ${r.entry_key}`));
 }
 
 main();

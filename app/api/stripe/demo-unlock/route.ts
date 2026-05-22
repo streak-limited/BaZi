@@ -1,4 +1,3 @@
-import { enqueueReportGeneration } from "@/lib/products/report-generation";
 import {
   getTrialByToken,
   isSupabaseConfigured,
@@ -31,7 +30,6 @@ export async function POST(request: Request) {
     "http://localhost:3000";
 
   const publicToken = body.publicToken?.trim();
-  const params = new URLSearchParams({ paid: "1", demo: "1" });
 
   if (publicToken && isSupabaseConfigured()) {
     const trial = await getTrialByToken(publicToken);
@@ -40,11 +38,11 @@ export async function POST(request: Request) {
         paid_at: new Date().toISOString(),
         stripe_payment_status: "demo",
       });
-      await updateTrialStatus(trial.id, "report_generating");
-      enqueueReportGeneration(trial.id);
+      // Report is generated on the payment-success hub (spinner → open report).
     }
   }
 
+  const params = new URLSearchParams({ paid: "1", demo: "1" });
   const redirectUrl = publicToken
     ? `${origin}/r/${publicToken}?${params.toString()}`
     : `${origin}/bazi/input?${params.toString()}`;
