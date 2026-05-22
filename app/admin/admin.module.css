@@ -171,3 +171,174 @@
   font-size: 0.85rem;
   margin: 0;
 }
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #9aa0a6;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #9aa0a6;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #3c4043;
+  background: #0f1115;
+  color: #e8eaed;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #c4c7cc;
+}
+
+.subHeading {
+  font-size: 0.9rem;
+  margin: 16px 0 8px;
+  color: #c4c7cc;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tabRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab,
+.tabActive {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #2a2f3a;
+  background: #1a1d24;
+  color: #9aa0a6;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.tabActive {
+  background: #2a3142;
+  color: #e8eaed;
+  border-color: #8ab4f8;
+}
+
+.secondaryBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #3c4043;
+  background: transparent;
+  color: #8ab4f8;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+
+.dangerBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #5c2b2b;
+  background: #3d1f1f;
+  color: #f28b82;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.addPromptBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+  align-items: center;
+}
+
+.addPromptBar .input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.promptList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.promptCard {
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.promptCard summary {
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+
+.promptCard summary::-webkit-details-marker {
+  display: none;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.wrap a.primaryBtn {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}

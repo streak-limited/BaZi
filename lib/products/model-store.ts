@@ -21,6 +21,16 @@ function parseTagRow(row: Record<string, unknown>): ProductTag {
   };
 }
 
+/** Legacy tags in config JSON before migration 007 */
+function tagsFromConfig(raw: ModelConfig & { tags?: string[] }): ProductTag[] {
+  const labels = raw.tags?.map((t) => t.trim()).filter(Boolean) ?? [];
+  return labels.map((label, i) => ({
+    id: label,
+    label,
+    sort_order: (i + 1) * 10,
+  }));
+}
+
 async function loadTagsForModels(
   modelIds: string[],
 ): Promise<Record<string, ProductTag[]>> {
@@ -33,7 +43,10 @@ async function loadTagsForModels(
     .select("model_id, tags(id, label, sort_order)")
     .in("model_id", modelIds);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.warn("[loadTagsForModels]", error.message);
+    return out;
+  }
 
   for (const row of data ?? []) {
     const modelId = String(row.model_id);
@@ -60,7 +73,10 @@ function rowToModel(
     media?: Record<string, string>;
     copy?: Record<string, string>;
     listing?: Record<string, unknown>;
+    tags?: string[];
   };
+  const resolvedTags =
+    tags.length > 0 ? tags : tagsFromConfig(raw);
   return {
     id: id as ModelId,
     slug: String(row.slug),
@@ -72,8 +88,12 @@ function rowToModel(
       : null,
     is_active: Boolean(row.is_active ?? true),
     config: parseModelConfig(raw, id, String(row.slug)),
-    tags,
+    tags: resolvedTags,
   };
+}
+
+function registryModels(): ProductModel[] {
+  return Object.keys(MODEL_REGISTRY).map((id) => registryFallback(id)!);
 }
 
 function registryFallback(id: string): ProductModel | null {
@@ -98,25 +118,32 @@ function registryFallback(id: string): ProductModel | null {
 
 export async function getTrialCountsByModel(): Promise<Record<string, number>> {
   if (!isSupabaseConfigured()) return {};
-  const db = getSupabaseAdmin();
-  let rows: { model_id: string }[] | null = null;
-  const modern = await db.from("trials").select("model_id");
-  if (modern.error) {
-    const legacy = await db.from("trials").select("modal_template_id");
-    if (legacy.error) throw new Error(legacy.error.message);
-    rows = (legacy.data ?? []).map((r) => ({
-      model_id: String(r.modal_template_id),
-    }));
-  } else {
-    rows = (modern.data ?? []).map((r) => ({ model_id: String(r.model_id) }));
+  try {
+    const db = getSupabaseAdmin();
+    let rows: { model_id: string }[] = [];
+    const modern = await db.from("trials").select("model_id");
+    if (modern.error) {
+      const legacy = await db.from("trials").select("modal_template_id");
+      if (legacy.error) {
+        console.warn("[getTrialCountsByModel]", legacy.error.message);
+        return {};
+      }
+      rows = (legacy.data ?? []).map((r) => ({
+        model_id: String(r.modal_template_id),
+      }));
+    } else {
+      rows = (modern.data ?? []).map((r) => ({ model_id: String(r.model_id) }));
+    }
+    const counts: Record<string, number> = {};
+    for (const row of rows) {
+      const id = String(row.model_id);
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    return counts;
+  } catch (e) {
+    console.warn("[getTrialCountsByModel]", e);
+    return {};
   }
-  const data = rows;
-  const counts: Record<string, number> = {};
-  for (const row of data ?? []) {
-    const id = String(row.model_id);
-    counts[id] = (counts[id] ?? 0) + 1;
-  }
-  return counts;
 }
 
 async function selectActiveCatalogRows(db: ReturnType<typeof getSupabaseAdmin>) {
@@ -132,7 +159,10 @@ async function selectActiveCatalogRows(db: ReturnType<typeof getSupabaseAdmin>) 
       .eq("is_active", true)
       .order("display_name");
   }
-  if (res.error) throw new Error(res.error.message);
+  if (res.error) {
+    console.warn("[selectActiveCatalogRows]", res.error.message);
+    return [];
+  }
   return res.data ?? [];
 }
 
@@ -169,14 +199,21 @@ async function selectCatalogRowById(db: ReturnType<typeof getSupabaseAdmin>, id:
 
 export async function listActiveModels(): Promise<ProductModel[]> {
   if (!isSupabaseConfigured()) {
-    return Object.keys(MODEL_REGISTRY).map((id) => registryFallback(id)!);
+    return registryModels();
   }
-  const db = getSupabaseAdmin();
-  const data = await selectActiveCatalogRows(db);
-
-  const rows = data as Record<string, unknown>[];
-  const tagMap = await loadTagsForModels(rows.map((r) => String(r.id)));
-  return rows.map((r) => rowToModel(r, tagMap[String(r.id)] ?? []));
+  try {
+    const db = getSupabaseAdmin();
+    const data = await selectActiveCatalogRows(db);
+    if (data.length === 0) {
+      return registryModels();
+    }
+    const rows = data as Record<string, unknown>[];
+    const tagMap = await loadTagsForModels(rows.map((r) => String(r.id)));
+    return rows.map((r) => rowToModel(r, tagMap[String(r.id)] ?? []));
+  } catch (e) {
+    console.warn("[listActiveModels]", e);
+    return registryModels();
+  }
 }
 
 export async function getModelBySlug(slug: string): Promise<ProductModel | null> {

@@ -1,4 +1,5 @@
 import { buildResult } from "@/lib/bazi-journey/build-result";
+import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
 import { buildDemoResultPayload } from "@/lib/result-demo";
 import type { ResultDeliverable } from "@/lib/products/types";
 import {
@@ -42,8 +43,13 @@ export async function POST(request: Request) {
       }
     }
 
+    const modelId =
+      (publicToken && isSupabaseConfigured()
+        ? (await getTrialByToken(publicToken))?.model_id
+        : null) ?? DEFAULT_BAZI_MODEL;
+
     const payload = useLiveAi()
-      ? await buildResult(userInput)
+      ? await buildResult(userInput, modelId)
       : buildDemoResultPayload(userInput);
 
     if (publicToken && isSupabaseConfigured()) {

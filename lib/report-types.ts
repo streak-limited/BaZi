@@ -1,6 +1,8 @@
 export type ContentType = "static" | "computed" | "ai";
 
 export interface ReportEntry {
+  /** Stable key — matches model_prompt_entries.entry_key and deliverable JSON */
+  entry_key?: string;
   id?: string;
   page: number;
   display_order: number;

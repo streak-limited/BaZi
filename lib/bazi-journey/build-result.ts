@@ -1,111 +1,14 @@
-import { generateReportText } from "@/lib/ai-generate";
-import { calculateBazi } from "@/lib/bazi/calculate";
-import { extractChartLabels } from "@/lib/bazi-journey/chart-labels";
 import type { ResultPayload, ResolvedResultEntry } from "@/lib/bazi-journey/types";
-import { fillPrompt } from "@/lib/fill-prompt";
-import { getPreReportData } from "@/lib/pre-report-data";
-import { PRE_REPORT_PROMPTS_BY_DESCRIPTION } from "@/lib/pre-report-prompts";
-import type { ReportEntry } from "@/lib/report-types";
+import { generateResultPayload } from "@/lib/products/generate-deliverable";
+import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
 import type { UserFormInput } from "@/lib/user-input";
 
-const CHART_LABEL_IDS = [
-  "pre-chart-label-正印",
-  "pre-chart-label-pian-cai",
-  "pre-chart-label-guan",
-  "pre-chart-label-shang-guan",
-  "pre-chart-label-zheng-cai",
-  "pre-chart-label-changsheng",
-  "pre-chart-label-muyu",
-  "pre-chart-label-huagai",
-  "pre-chart-label-niansha",
-  "pre-chart-label-wangshen",
-  "pre-chart-label-disha",
-  "pre-chart-日干",
-] as const;
-
-function formatFourPillarsDisplay(fourPillars: string): string {
-  return fourPillars.split(" ").join("\n");
-}
-
-function buildComputedMap(
-  input: UserFormInput,
-  fourPillars: string,
-  name: string,
-): Record<string, string> {
-  const labels = extractChartLabels(input);
-  const map: Record<string, string> = {
-    "pre-four-pillars": formatFourPillarsDisplay(fourPillars),
-    "pre-subject-name": name.trim() || "命主",
-  };
-  CHART_LABEL_IDS.forEach((id, i) => {
-    map[id] = labels[i] ?? "—";
-  });
-  return map;
-}
-
-async function generateAiBlock(
-  entry: ReportEntry,
-  variables: NonNullable<ReturnType<typeof calculateBazi>["variables"]>,
-): Promise<string> {
-  const template = PRE_REPORT_PROMPTS_BY_DESCRIPTION[entry.description];
-  if (!template) {
-    throw new Error(`Missing pre-report prompt: ${entry.description}`);
-  }
-  const prompt = fillPrompt(template, variables);
-  const { text } = await generateReportText(prompt, {
-    sectionDescription: entry.description,
-  });
-  return text.replace(/\s{2,}/g, " ").trim();
-}
-
-/** Generate result page: static template + computed bazi + 5 AI narratives */
+/** Generate result page from model_prompt_entries (DB) with code fallback */
 export async function buildResult(
   input: UserFormInput,
+  modelId: string = DEFAULT_BAZI_MODEL,
 ): Promise<ResultPayload> {
-  const bazi = calculateBazi(input);
-  if (bazi.error || !bazi.chart || !bazi.variables) {
-    throw new Error(bazi.error ?? "八字計算失敗");
-  }
-
-  const template = getPreReportData();
-  const aiEntries = template.entries.filter((e) => e.type === "ai");
-  const computedMap = buildComputedMap(
-    input,
-    bazi.chart.fourPillars,
-    bazi.variables.name,
-  );
-
-  const entryKey = (e: ReportEntry) =>
-    e.id ?? `p${e.page}-o${e.display_order}`;
-
-  const aiContents = await Promise.all(
-    aiEntries.map(async (entry) => ({
-      key: entryKey(entry),
-      content: await generateAiBlock(entry, bazi.variables!),
-    })),
-  );
-  const aiById = Object.fromEntries(aiContents.map((a) => [a.key, a.content]));
-
-  const entries: ResolvedResultEntry[] = template.entries.map((entry) => {
-    if (entry.type === "ai") {
-      return { ...entry, content: aiById[entryKey(entry)] ?? "" };
-    }
-    if (entry.type === "computed") {
-      const id = entry.id ?? entryKey(entry);
-      return {
-        ...entry,
-        content: computedMap[id] ?? entry.content,
-      };
-    }
-    return { ...entry, content: entry.content ?? "" };
-  });
-
-  return {
-    entries,
-    chart: bazi.chart,
-    variables: bazi.variables,
-    generatedAt: new Date().toISOString(),
-  };
+  return generateResultPayload(modelId, input);
 }
 
 /** Group entries by section for the teaser UI */

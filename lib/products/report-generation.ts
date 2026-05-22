@@ -1,5 +1,6 @@
 import { buildDemoReportDeliverable } from "@/lib/report-demo";
 import { queueReportReadyEmail } from "@/lib/products/email";
+import { generateReportDeliverable } from "@/lib/products/generate-deliverable";
 import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
 import { getModelById } from "@/lib/products/model-store";
 import {
@@ -8,6 +9,10 @@ import {
   updateTrialStatus,
 } from "@/lib/products/trial-store";
 import { after } from "next/server";
+
+function useLiveAiReport(): boolean {
+  return process.env.USE_LIVE_AI_REPORT === "1";
+}
 
 function reportGenerationDelayMs(): number {
   const raw = process.env.REPORT_GENERATION_DELAY_MS?.trim();
@@ -25,12 +30,17 @@ export async function completeReportGeneration(trialId: string): Promise<void> {
     (await getModelById(DEFAULT_BAZI_MODEL));
   if (!model) return;
 
-  const demo = buildDemoReportDeliverable();
+  const modelId = trial.model_id ?? DEFAULT_BAZI_MODEL;
+  const live = useLiveAiReport();
+  const deliverable = live
+    ? await generateReportDeliverable(modelId, trial.user_input)
+    : buildDemoReportDeliverable();
 
-  await saveReportDeliverable(trial.id, demo, {
-    demo: true,
+  await saveReportDeliverable(trial.id, deliverable, {
+    demo: !live,
     model: model.id,
     page_count: model.config.page_count,
+    provider: live ? process.env.AI_PROVIDER ?? "gemini" : "demo_json",
   });
 
   await updateTrialStatus(trial.id, "completed");

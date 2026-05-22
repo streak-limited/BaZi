@@ -26,9 +26,14 @@ export default async function AdminPage() {
             Models · Trials · Payments · Email log
           </p>
         </div>
-        <Link href="/m/bazi-full-report/intro" className={styles.muted}>
-          前往產品 intro →
-        </Link>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <Link href="/admin/models" className={styles.muted}>
+            Manage models & prompts →
+          </Link>
+          <Link href="/m/bazi-full-report/intro" className={styles.muted}>
+            產品 intro →
+          </Link>
+        </div>
       </header>
 
       {!isAdminConfigured() && (
@@ -100,6 +105,8 @@ export default async function AdminPage() {
                       : "—"}
                   </td>
                   <td>
+                    <Link href={`/admin/models/${m.id}`}>edit</Link>
+                    {" · "}
                     <Link href={`/m/${m.slug}/intro`}>intro</Link>
                     {" · "}
                     <Link href={`/m/${m.slug}/input`}>input</Link>
