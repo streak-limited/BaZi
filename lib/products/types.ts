@@ -26,6 +26,19 @@ export interface ModalTemplateConfig {
   price_hkd?: number;
   result_entries_ref?: string;
   report_entries_ref?: string;
+  /** UI bundle key — maps to lib/modals/ui-registry */
+  ui_key?: string;
+  media?: {
+    introVideo?: string;
+    inputVideo1?: string;
+    inputVideo2?: string;
+  };
+  copy?: {
+    introTitle?: string;
+    introSubtitle?: string;
+    inputHeaderTitle?: string;
+    inputHeaderSubtitle?: string;
+  };
   /** @deprecated */
   pre_report_entries_ref?: string;
   /** @deprecated */

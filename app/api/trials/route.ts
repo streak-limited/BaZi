@@ -1,8 +1,10 @@
 import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
+import { getModalBySlug } from "@/lib/products/modal-store";
 import {
   createTrial,
   isSupabaseConfigured,
 } from "@/lib/products/trial-store";
+import type { ModalTemplateId } from "@/lib/products/types";
 import { getAppBaseUrl } from "@/lib/supabase/server";
 import { DEFAULT_USER_INPUT, type UserFormInput } from "@/lib/user-input";
 import type { BirthPlace } from "@/lib/astrology/types";
@@ -22,6 +24,7 @@ export async function POST(request: Request) {
   }
 
   let body: {
+    modalSlug?: string;
     modalTemplateId?: string;
     userInput?: Partial<UserFormInput>;
     email?: string;
@@ -39,9 +42,21 @@ export async function POST(request: Request) {
     ...body.userInput,
   };
 
+  let modalTemplateId = (body.modalTemplateId ?? DEFAULT_BAZI_MODAL) as ModalTemplateId;
+  if (body.modalSlug?.trim()) {
+    const modal = await getModalBySlug(body.modalSlug.trim());
+    if (!modal) {
+      return NextResponse.json(
+        { error: `Unknown modal slug: ${body.modalSlug}` },
+        { status: 404 },
+      );
+    }
+    modalTemplateId = modal.id;
+  }
+
   try {
     const trial = await createTrial({
-      modalTemplateId: (body.modalTemplateId ?? DEFAULT_BAZI_MODAL) as "bazi_full",
+      modalTemplateId,
       userInput,
       email: body.email ?? userInput.email,
       birthPlace: body.birthPlace ?? null,

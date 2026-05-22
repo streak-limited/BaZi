@@ -1,6 +1,7 @@
 import { buildDemoReportDeliverable } from "@/lib/report-demo";
 import { queueReportReadyEmail } from "@/lib/products/email";
-import { getModalDefinition, DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
+import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
+import { getModalById } from "@/lib/products/modal-store";
 import {
   getTrialById,
   saveReportDeliverable,
@@ -20,7 +21,10 @@ export async function completeReportGeneration(trialId: string): Promise<void> {
   const trial = await getTrialById(trialId);
   if (!trial) return;
 
-  const modal = getModalDefinition(trial.modal_template_id ?? DEFAULT_BAZI_MODAL);
+  const modal =
+    (await getModalById(trial.modal_template_id ?? DEFAULT_BAZI_MODAL)) ??
+    (await getModalById(DEFAULT_BAZI_MODAL));
+  if (!modal) return;
   const demo = buildDemoReportDeliverable();
 
   await saveReportDeliverable(trial.id, demo, {

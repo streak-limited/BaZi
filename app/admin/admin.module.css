@@ -1,0 +1,173 @@
+.wrap {
+  min-height: 100dvh;
+  background: #0f1115;
+  color: #e8eaed;
+  font-family: system-ui, sans-serif;
+  padding: 24px 20px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.muted {
+  color: #9aa0a6;
+  font-size: 0.875rem;
+  margin: 4px 0 0;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.statCard {
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 120px;
+}
+
+.statCard strong {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.section {
+  margin-bottom: 36px;
+}
+
+.section h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: #c4c7cc;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #2a2f3a;
+  border-radius: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #2a2f3a;
+  white-space: nowrap;
+}
+
+.table th {
+  background: #1a1d24;
+  color: #9aa0a6;
+  font-weight: 500;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table a {
+  color: #8ab4f8;
+  text-decoration: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #2a3142;
+  font-size: 0.75rem;
+}
+
+.warn {
+  background: #3d2e14;
+  border: 1px solid #6b4f1a;
+  color: #f0c674;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+}
+
+.loginWrap {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f1115;
+  padding: 24px;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 360px;
+  background: #1a1d24;
+  border: 1px solid #2a2f3a;
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loginCard h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #e8eaed;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #3c4043;
+  background: #0f1115;
+  color: #e8eaed;
+  font-size: 0.95rem;
+}
+
+.primaryBtn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #8ab4f8;
+  color: #0f1115;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.errorText {
+  color: #f28b82;
+  font-size: 0.85rem;
+  margin: 0;
+}

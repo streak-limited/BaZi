@@ -1,9 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import IntroStep from "@/app/bazi/intro/IntroStep";
-import { useRouter } from "next/navigation";
-
-export default function BaziIntroPage() {
-  const router = useRouter();
-  return <IntroStep onContinue={() => router.push("/bazi/input")} />;
+export default function LegacyBaziIntroPage() {
+  redirect("/m/bazi-full-report/intro");
 }

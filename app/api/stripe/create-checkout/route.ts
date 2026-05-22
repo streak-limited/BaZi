@@ -1,3 +1,6 @@
+import { getModalById } from "@/lib/products/modal-store";
+import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
+import { modalInputPath } from "@/lib/modals/paths";
 import {
   getTrialById,
   getTrialByToken,
@@ -48,6 +51,8 @@ export async function POST(request: Request) {
 
   let trialId = body.trialId?.trim();
   let publicToken = body.publicToken?.trim();
+  let modalTemplateId = DEFAULT_BAZI_MODAL;
+  let modalSlug = "bazi-full-report";
 
   if (isSupabaseConfigured() && (trialId || publicToken)) {
     const trial = publicToken
@@ -60,19 +65,29 @@ export async function POST(request: Request) {
     }
     trialId = trial.id;
     publicToken = trial.public_token;
+    modalTemplateId = trial.modal_template_id;
+    const modal = await getModalById(trial.modal_template_id);
+    if (modal) modalSlug = modal.slug;
   }
 
+  const modal =
+    (await getModalById(modalTemplateId)) ??
+    (await getModalById(DEFAULT_BAZI_MODAL));
+
   const priceId = process.env.STRIPE_PRICE_ID?.trim();
-  const amountHkd = getStripeAmountHkd();
+  const amountHkd =
+    modal?.config.price_hkd ?? getStripeAmountHkd();
   const productName =
-    process.env.STRIPE_PRODUCT_NAME?.trim() ?? "八字完整命理報告";
+    process.env.STRIPE_PRODUCT_NAME?.trim() ??
+    modal?.display_name ??
+    "八字完整命理報告";
 
   const successUrl = publicToken
     ? `${origin}/r/${publicToken}?paid=1&session_id={CHECKOUT_SESSION_ID}`
-    : `${origin}/bazi/intro?paid=1&session_id={CHECKOUT_SESSION_ID}`;
+    : `${origin}/m/${modalSlug}/input?paid=1&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = publicToken
     ? `${origin}/r/${publicToken}/result`
-    : `${origin}/bazi/input`;
+    : `${origin}${modalInputPath(modalSlug)}`;
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -95,8 +110,8 @@ export async function POST(request: Request) {
         subjectId: body.subjectId?.trim() ?? "",
         trial_id: trialId ?? "",
         public_token: publicToken ?? "",
-        modal_template_id: "bazi_full",
-        product: "bazi-full-report",
+        modal_template_id: modalTemplateId,
+        product: modalSlug,
       },
     });
 

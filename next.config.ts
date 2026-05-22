@@ -11,17 +11,27 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/bazi",
-        destination: "/bazi/intro",
+        destination: "/m/bazi-full-report/intro",
+        permanent: false,
+      },
+      {
+        source: "/bazi/intro",
+        destination: "/m/bazi-full-report/intro",
+        permanent: false,
+      },
+      {
+        source: "/bazi/input",
+        destination: "/m/bazi-full-report/input",
         permanent: false,
       },
       {
         source: "/bazi/flow",
-        destination: "/bazi/intro",
+        destination: "/m/bazi-full-report/intro",
         permanent: true,
       },
       {
         source: "/flow",
-        destination: "/bazi/intro",
+        destination: "/m/bazi-full-report/intro",
         permanent: true,
       },
       {
