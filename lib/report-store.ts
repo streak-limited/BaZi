@@ -91,6 +91,29 @@ async function ensureSchema(): Promise<void> {
       `UPDATE report_sessions SET created_at = updated_at WHERE created_at = '' OR created_at IS NULL`,
     );
   }
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS astrology_charts (
+      id TEXT PRIMARY KEY,
+      subject_id TEXT NOT NULL,
+      mode TEXT NOT NULL,
+      birth_place TEXT NOT NULL,
+      birth_place_b TEXT,
+      partner_subject_id TEXT,
+      couple_type TEXT,
+      chart_json TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+  `);
+  await db.execute(`
+    CREATE INDEX IF NOT EXISTS idx_astrology_charts_subject
+    ON astrology_charts (subject_id, created_at DESC)
+  `);
+}
+
+/** Shared DB access for astrology chart store and other modules */
+export async function runWithDb<T>(fn: (db: Client) => Promise<T>): Promise<T> {
+  return withDb(fn);
 }
 
 async function withDb<T>(fn: (db: Client) => Promise<T>): Promise<T> {
@@ -274,6 +297,10 @@ export async function createSubject(
 
 export async function deleteSubject(subjectId: string): Promise<boolean> {
   return withDb(async (db) => {
+    await db.execute({
+      sql: `DELETE FROM astrology_charts WHERE subject_id = ? OR partner_subject_id = ?`,
+      args: [subjectId, subjectId],
+    });
     const result = await db.execute({
       sql: `DELETE FROM report_sessions WHERE id = ?`,
       args: [subjectId],

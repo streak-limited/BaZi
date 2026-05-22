@@ -6,19 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup:astrology": "bash scripts/setup-astrology-python.sh",
+    "db:migrate": "node scripts/migrate-product-flow.mjs",
+    "db:migrate:check": "node scripts/check-supabase-tables.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@libsql/client": "^0.17.3",
+    "@supabase/supabase-js": "^2.106.1",
     "better-sqlite3": "^12.10.0",
     "lunar-javascript": "^1.7.7",
+    "nanoid": "^5.1.11",
     "next": "16.2.6",
     "openai": "^6.38.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "stripe": "^22.1.1"
   },
   "devDependencies": {
+    "pg": "^8.16.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",

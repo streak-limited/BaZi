@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
         destination: "/bazi/pre-report",
         permanent: true,
       },
+      {
+        source: "/bazi",
+        destination: "/bazi/flow",
+        permanent: false,
+      },
     ];
   },
 };

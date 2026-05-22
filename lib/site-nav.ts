@@ -15,6 +15,11 @@ export const SITE_NAV_GROUPS: SiteNavGroup[] = [
     title: "八字",
     items: [
       {
+        href: "/bazi/flow",
+        label: "開始八字",
+        description: "沉浸 → 輸入 → AI pre-report → Stripe 付款",
+      },
+      {
         href: "/bazi/report",
         label: "完整報告",
         description: "20 頁 AI 報告 · 命主 · Gemini 生成",
@@ -22,7 +27,7 @@ export const SITE_NAV_GROUPS: SiteNavGroup[] = [
       {
         href: "/bazi/pre-report",
         label: "Pre-report 拆解",
-        description: "範山道令導流單頁 · 內容拆解",
+        description: "範山道令導流單頁 · 內容拆解（開發用）",
       },
     ],
   },
@@ -38,6 +43,16 @@ export const SITE_NAV_GROUPS: SiteNavGroup[] = [
         href: "/fortune-lots",
         label: "靈籤求籤",
         description: "觀音靈籤 · 六十甲子籤",
+      },
+    ],
+  },
+  {
+    title: "星盤",
+    items: [
+      {
+        href: "/astrology",
+        label: "西洋星盤",
+        description: "個人解碼 · 合盤 · 行運 · pyswisseph",
       },
     ],
   },

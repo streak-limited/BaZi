@@ -2,8 +2,18 @@ import { PRE_REPORT_LENGTH_BOUNDS } from "@/lib/pre-report-prompts";
 
 /** Per-section length targets — sync with scripts/prompt_templates.py LENGTH_BY_DESCRIPTION */
 
+import {
+  ASTRO_NATAL_SECTION,
+  ASTRO_SYNASTRY_SECTION,
+  ASTRO_TRANSIT_SECTION,
+} from "@/lib/astrology/prompts";
+
 export const PROMPT_LENGTH_BOUNDS: Record<string, [number, number]> = {
   ...PRE_REPORT_LENGTH_BOUNDS,
+  [ASTRO_NATAL_SECTION]: [280, 520],
+  [ASTRO_SYNASTRY_SECTION]: [320, 580],
+  [ASTRO_TRANSIT_SECTION]: [260, 480],
+  "占星：合盤單相位": [70, 160],
   "AI 章節開場導語": [95, 120],
   "AI 分析內文：用神處方·忌神迴避整理": [180, 235],
   "AI 分析內文：財運與你命格的關係": [310, 395],

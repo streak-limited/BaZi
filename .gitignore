@@ -23,6 +23,7 @@
 # python
 __pycache__/
 *.pyc
+.venv-astrology/
 
 # misc
 .DS_Store
