@@ -1,11 +1,11 @@
 "use client";
 
-import { groupEntriesBySection } from "@/lib/bazi-flow/build-pre-report";
-import type { PreReportPayload } from "@/lib/bazi-flow/types";
+import { groupEntriesBySection } from "@/lib/bazi-journey/build-result";
+import type { ResultPayload } from "@/lib/bazi-journey/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import styles from "./bazi-flow.module.css";
+import styles from "./bazi-intro.module.css";
 
 const TEASER_BASE =
   "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw/teaser";
@@ -17,26 +17,26 @@ interface StripeUiConfig {
   allowSkip: boolean;
 }
 
-interface PreReportViewProps {
-  payload: PreReportPayload;
+interface ResultViewProps {
+  payload: ResultPayload;
   subjectId?: string | null;
   /** When set, checkout + saved deliverables use Supabase trial */
   publicToken?: string | null;
 }
 
 function pickImage(
-  entries: PreReportPayload["entries"],
+  entries: ResultPayload["entries"],
   description: string,
 ): string | null {
   const e = entries.find((x) => x.description === description);
   return e?.image_url ?? null;
 }
 
-export default function PreReportView({
+export default function ResultView({
   payload,
   subjectId = null,
   publicToken = null,
-}: PreReportViewProps) {
+}: ResultViewProps) {
   const router = useRouter();
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
@@ -127,7 +127,7 @@ export default function PreReportView({
         router.push(`/r/${publicToken}?paid=1&demo=1`);
         return;
       }
-      router.push("/bazi/flow?paid=1&demo=1");
+      router.push("/bazi/input?paid=1&demo=1");
     } catch (e) {
       setPayError(e instanceof Error ? e.message : "測試解鎖失敗");
     } finally {
@@ -286,13 +286,13 @@ export default function PreReportView({
                 wordBreak: "break-all",
               }}
             >
-              你的報告連結（付款後亦可用）：
-              <br />
+              此頁即你的專屬連結，請收藏。付款後在
               <Link href={`/r/${publicToken}`} style={{ textDecoration: "underline" }}>
-                {typeof window !== "undefined"
-                  ? `${window.location.origin}/r/${publicToken}`
-                  : `/r/${publicToken}`}
+                {" "}
+                報告首頁
               </Link>
+              {" "}
+              開完整 20 頁報告（內容不變、唔會重跑 AI）。
             </p>
           )}
           {stripe?.testMode && (

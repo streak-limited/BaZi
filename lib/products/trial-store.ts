@@ -1,11 +1,11 @@
 import { getAppBaseUrl, getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { BirthPlace } from "@/lib/astrology/types";
 import type {
-  FullReportDeliverable,
   ModalTemplateId,
   PaymentRow,
   PaymentStatus,
-  PreReportDeliverable,
+  ReportDeliverable,
+  ResultDeliverable,
   TrialBundle,
   TrialDeliverableRow,
   TrialPhase,
@@ -53,9 +53,9 @@ function rowToTrial(row: Record<string, unknown>): TrialRow {
 function urlsForToken(publicToken: string) {
   const base = getAppBaseUrl();
   return {
-    reportUrl: `${base}/r/${publicToken}`,
-    preReportUrl: `${base}/r/${publicToken}/pre-report`,
-    fullReportUrl: `${base}/r/${publicToken}/report`,
+    hubUrl: `${base}/r/${publicToken}`,
+    resultUrl: `${base}/r/${publicToken}/result`,
+    reportUrl: `${base}/r/${publicToken}/report`,
   };
 }
 
@@ -324,22 +324,27 @@ export async function loadTrialBundle(
   return { trial, deliverables, payment, ...urls };
 }
 
-export async function savePreReportDeliverable(
+export async function saveResultDeliverable(
   trialId: string,
-  payload: PreReportDeliverable,
+  payload: ResultDeliverable,
   aiMeta?: Record<string, unknown>,
 ): Promise<void> {
-  await saveDeliverable(trialId, "pre_report", payload, aiMeta);
-  await updateTrialStatus(trialId, "pre_report_ready");
+  await saveDeliverable(trialId, "result", payload, aiMeta);
+  await updateTrialStatus(trialId, "result_ready");
 }
 
-export async function saveFullReportDeliverable(
+export async function saveReportDeliverable(
   trialId: string,
-  payload: FullReportDeliverable,
+  payload: ReportDeliverable,
   aiMeta?: Record<string, unknown>,
 ): Promise<void> {
-  await saveDeliverable(trialId, "full_report", payload, aiMeta);
+  await saveDeliverable(trialId, "report", payload, aiMeta);
   await updateTrialStatus(trialId, "completed");
 }
+
+/** @deprecated Use saveResultDeliverable */
+export const savePreReportDeliverable = saveResultDeliverable;
+/** @deprecated Use saveReportDeliverable */
+export const saveFullReportDeliverable = saveReportDeliverable;
 
 export { isSupabaseConfigured };

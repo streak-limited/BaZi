@@ -1,54 +1,60 @@
 "use client";
 
 import PageHeader from "@/components/PageHeader";
-import ImmersionStep from "@/app/bazi/flow/ImmersionStep";
-import InputWizard from "@/app/bazi/flow/InputWizard";
-import PaidSuccessStep from "@/app/bazi/flow/PaidSuccessStep";
-import PreReportView from "@/app/bazi/flow/PreReportView";
-import { INPUT_STEPS } from "@/lib/bazi-flow/config";
+import InputWizard from "@/app/bazi/intro/InputWizard";
+import PaidSuccessStep from "@/app/bazi/intro/PaidSuccessStep";
+import { INPUT_STEPS } from "@/lib/bazi-journey/config";
 import {
-  BAZI_FLOW_DRAFT_KEY,
-  type BaziFlowDraft,
-  type BaziFlowStep,
-  type PreReportPayload,
-} from "@/lib/bazi-flow/types";
+  BAZI_JOURNEY_DRAFT_KEY,
+  type BaziJourneyDraft,
+  type BaziJourneyStep,
+  type ResultPayload,
+} from "@/lib/bazi-journey/types";
 import { aiOutputKey } from "@/lib/report-storage-types";
 import { ACTIVE_SUBJECT_KEY } from "@/lib/subject-session";
 import { DEFAULT_USER_INPUT, type UserFormInput } from "@/lib/user-input";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import styles from "./bazi-flow.module.css";
+import styles from "@/app/bazi/intro/bazi-intro.module.css";
 
-interface BaziFlowClientProps {
-  stripeEnabled?: boolean;
-}
-
-function loadDraft(): BaziFlowDraft | null {
+function loadDraft(): BaziJourneyDraft | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = sessionStorage.getItem(BAZI_FLOW_DRAFT_KEY);
+    const raw =
+      sessionStorage.getItem(BAZI_JOURNEY_DRAFT_KEY) ??
+      sessionStorage.getItem("bazi-flow-draft");
     if (!raw) return null;
-    return JSON.parse(raw) as BaziFlowDraft;
+    const parsed = JSON.parse(raw) as BaziJourneyDraft & {
+      preReport?: ResultPayload | null;
+      step?: string;
+    };
+    if (parsed.preReport && !parsed.result) {
+      parsed.result = parsed.preReport;
+    }
+    const legacyStep = parsed.step as string | undefined;
+    if (legacyStep === "pre-report" || legacyStep === "immersion") {
+      parsed.step = legacyStep === "immersion" ? "intro" : "input";
+    }
+    return parsed as BaziJourneyDraft;
   } catch {
     return null;
   }
 }
 
-function saveDraft(draft: BaziFlowDraft) {
-  sessionStorage.setItem(BAZI_FLOW_DRAFT_KEY, JSON.stringify(draft));
+function saveDraft(draft: BaziJourneyDraft) {
+  sessionStorage.setItem(BAZI_JOURNEY_DRAFT_KEY, JSON.stringify(draft));
 }
 
-export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFlowClientProps) {
+export default function BaziInputClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const paidFromUrl = searchParams.get("paid") === "1";
   const demoPaid = searchParams.get("demo") === "1";
 
-  const [step, setStep] = useState<BaziFlowStep>("immersion");
+  const [step, setStep] = useState<BaziJourneyStep>("input");
   const [input, setInput] = useState<UserFormInput>(DEFAULT_USER_INPUT);
   const [inputStepIndex, setInputStepIndex] = useState(0);
   const [subjectId, setSubjectId] = useState<string | null>(null);
-  const [preReport, setPreReport] = useState<PreReportPayload | null>(null);
   const [publicToken, setPublicToken] = useState<string | null>(null);
   const [reportHubUrl, setReportHubUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -60,54 +66,34 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
       setInput(draft.input);
       setInputStepIndex(draft.inputStepIndex);
       setSubjectId(draft.subjectId);
-      setPreReport(draft.preReport);
       setPublicToken(draft.publicToken ?? null);
       setReportHubUrl(draft.reportHubUrl ?? null);
       if (!paidFromUrl && draft.step !== "paid") {
-        setStep(draft.step);
+        setStep(draft.step === "intro" ? "input" : draft.step);
       }
     }
     if (paidFromUrl) setStep("paid");
-    if (searchParams.get("step") === "pre-report" && draft?.preReport) {
-      setStep("pre-report");
-    }
-  }, [paidFromUrl, searchParams]);
+  }, [paidFromUrl]);
 
   const persistDraft = useCallback(
-    (patch: Partial<BaziFlowDraft>) => {
-      const next: BaziFlowDraft = {
+    (patch: Partial<BaziJourneyDraft>) => {
+      saveDraft({
         step,
         input,
         inputStepIndex,
         subjectId,
-        preReport,
+        result: null,
+        publicToken,
+        reportHubUrl,
         ...patch,
-      };
-      saveDraft(next);
+      });
     },
-    [step, input, inputStepIndex, subjectId, preReport],
+    [step, input, inputStepIndex, subjectId, publicToken, reportHubUrl],
   );
 
   useEffect(() => {
-    persistDraft({
-      step,
-      input,
-      inputStepIndex,
-      subjectId,
-      preReport,
-      publicToken,
-      reportHubUrl,
-    });
-  }, [
-    step,
-    input,
-    inputStepIndex,
-    subjectId,
-    preReport,
-    publicToken,
-    reportHubUrl,
-    persistDraft,
-  ]);
+    persistDraft({ step, input, inputStepIndex, subjectId, publicToken, reportHubUrl });
+  }, [step, input, inputStepIndex, subjectId, publicToken, reportHubUrl, persistDraft]);
 
   const patchInput = (patch: Partial<UserFormInput>) => {
     setInput((prev) => ({ ...prev, ...patch }));
@@ -136,7 +122,7 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
         localStorage.setItem(ACTIVE_SUBJECT_KEY, sid);
       }
 
-      setGenStatus("建立 Supabase trial…");
+      setGenStatus("建立 trial…");
       let trialToken: string | null = null;
       const trialRes = await fetch("/api/trials", {
         method: "POST",
@@ -156,9 +142,9 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
         throw new Error(trialData.error ?? "無法建立 trial");
       }
 
-      setGenStatus("範山道令正在為你撰寫 pre-report（約 1–2 分鐘）…");
+      setGenStatus("載入 Result 預覽（demo 資料）…");
 
-      const genRes = await fetch("/api/bazi-flow/generate-pre-report", {
+      const genRes = await fetch("/api/bazi/generate-result", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -175,7 +161,7 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
           Record<string, { text: string; updatedAt: string }>
         > = {};
         const now = new Date().toISOString();
-        for (const e of payload.entries as PreReportPayload["entries"]) {
+        for (const e of payload.entries as ResultPayload["entries"]) {
           if (e.type === "ai") {
             const key = e.id ?? aiOutputKey(e.page, e.display_order);
             aiOutputs[key] = {
@@ -194,9 +180,21 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
         });
       }
 
-      setPreReport(payload as PreReportPayload);
-      setStep("pre-report");
+      persistDraft({
+        step: "input",
+        result: payload as ResultPayload,
+        publicToken: trialToken,
+        reportHubUrl: trialToken
+          ? `${typeof window !== "undefined" ? window.location.origin : ""}/r/${trialToken}`
+          : null,
+      });
       setGenStatus("");
+      if (trialToken) {
+        router.replace(`/r/${trialToken}/result`);
+        return;
+      }
+      setError("需要 Supabase trial 才能顯示 result 頁");
+      setStep("input");
     } catch (e) {
       setError(e instanceof Error ? e.message : "流程失敗");
       setStep("input");
@@ -206,18 +204,14 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
 
   return (
     <div className={styles.shell}>
-      {step !== "pre-report" && step !== "generating" && (
+      {step !== "generating" && step !== "paid" && (
         <PageHeader
           title="八字命理"
-          subtitle="沉浸 → 輸入 → Pre-report → 付款解鎖完整報告"
+          subtitle="輸入 → Result → 付款解鎖 Report"
         />
       )}
 
       {error && <div className={styles.errorBanner}>{error}</div>}
-
-      {step === "immersion" && (
-        <ImmersionStep onContinue={() => setStep("input")} />
-      )}
 
       {step === "input" && (
         <InputWizard
@@ -234,17 +228,9 @@ export default function BaziFlowClient({ stripeEnabled: _stripeEnabled }: BaziFl
           <div className={styles.spinner} />
           <p>{genStatus || "生成中…"}</p>
           <p style={{ fontSize: "0.85rem", opacity: 0.65 }}>
-            正在呼叫 AI 撰寫五段導流敘述，請勿關閉頁面
+            正在呼叫 AI，請勿關閉頁面
           </p>
         </div>
-      )}
-
-      {step === "pre-report" && preReport && (
-        <PreReportView
-          payload={preReport}
-          subjectId={subjectId}
-          publicToken={publicToken}
-        />
       )}
 
       {step === "paid" && (

@@ -13,7 +13,7 @@ export default function ReportPage() {
       data={data}
       title="Report content breakdown"
       showPageFilter
-      secondaryNavHref="/bazi/pre-report"
+      secondaryNavHref="/bazi/result"
       secondaryNavLabel="Pre-report →"
     />
   );

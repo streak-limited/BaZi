@@ -4,7 +4,7 @@ import styles from "./home-menu.module.css";
 
 const LINK_CLASS: Record<string, string> = {
   "/bazi/report": styles.menuLinkBazi,
-  "/bazi/pre-report": styles.menuLinkPre,
+  "/bazi/result": styles.menuLinkPre,
   "/ask-gua": styles.menuLinkGua,
   "/fortune-lots": styles.menuLinkLots,
   "/daily-fortune": styles.menuLinkDaily,

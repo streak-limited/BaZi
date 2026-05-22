@@ -1,13 +1,13 @@
-import FullReportReader from "@/app/r/[token]/report/FullReportReader";
-import type { FullReportDeliverable } from "@/lib/products/types";
-import { isSupabaseConfigured } from "@/lib/products/trial-store";
-import { loadTrialBundle } from "@/lib/products/trial-store";
+import ReportReader from "@/app/r/[token]/report/ReportReader";
+import { buildDemoReportDeliverable } from "@/lib/report-demo";
+import type { ReportDeliverable } from "@/lib/products/types";
+import { isSupabaseConfigured, loadTrialBundle } from "@/lib/products/trial-store";
 import Link from "next/link";
 import styles from "../r.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function SharedFullReportPage({
+export default async function SharedReportPage({
   params,
 }: {
   params: Promise<{ token: string }>;
@@ -35,27 +35,50 @@ export default async function SharedFullReportPage({
     );
   }
 
-  const raw = bundle.deliverables.full_report?.content;
-  if (!raw) {
+  const legacy = bundle.deliverables as Record<string, { content?: unknown }>;
+  const raw =
+    bundle.deliverables.report?.content ?? legacy.full_report?.content;
+
+  const legacyDels = bundle.deliverables as Record<string, unknown>;
+  const hasReportDeliverable = Boolean(
+    bundle.deliverables.report ?? legacyDels.full_report,
+  );
+  const canAccess =
+    bundle.trial.status === "completed" || hasReportDeliverable;
+
+  if (!canAccess) {
     return (
       <div className={styles.page}>
         <div className={styles.inner}>
-          <h1 className={styles.title}>完整報告尚未就緒</h1>
+          <h1 className={styles.title}>Report 生成中</h1>
           <p className={styles.sub}>
-            狀態：{bundle.trial.status}。付款成功後系統會生成並 Email 通知你。
+            完整報告仍在準備中。請回到付款成功頁等候，完成後會通知你。
           </p>
-          <Link href={`/r/${token}`} className={styles.btn}>
-            返回報告首頁
+          <Link href={`/r/${token}?paid=1`} className={styles.btn}>
+            返回付款成功頁
+          </Link>
+          <Link href={`/r/${token}/result`} className={styles.btnSecondary}>
+            查看 Result 預覽
           </Link>
         </div>
       </div>
     );
   }
 
+  let deliverable: ReportDeliverable;
+  let isDemo = false;
+
+  if (raw) {
+    deliverable = raw as ReportDeliverable;
+    isDemo = Boolean(
+      (deliverable.metadata as { demo_mode?: boolean })?.demo_mode,
+    );
+  } else {
+    deliverable = buildDemoReportDeliverable();
+    isDemo = true;
+  }
+
   return (
-    <FullReportReader
-      token={token}
-      deliverable={raw as FullReportDeliverable}
-    />
+    <ReportReader token={token} deliverable={deliverable} isDemo={isDemo} />
   );
 }

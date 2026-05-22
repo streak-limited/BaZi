@@ -1,9 +1,15 @@
+import { enqueueReportGeneration } from "@/lib/products/report-generation";
+import {
+  getTrialByToken,
+  isSupabaseConfigured,
+  updateTrialStatus,
+} from "@/lib/products/trial-store";
 import { allowStripeSkip } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-/** Dev / demo: skip Stripe Checkout and go to paid step */
+/** Dev / demo: skip Stripe → payment success hub → background report + email */
 export async function POST(request: Request) {
   if (!allowStripeSkip()) {
     return NextResponse.json(
@@ -26,13 +32,22 @@ export async function POST(request: Request) {
 
   const publicToken = body.publicToken?.trim();
   const params = new URLSearchParams({ paid: "1", demo: "1" });
-  if (body.subjectId?.trim()) {
-    params.set("subjectId", body.subjectId.trim());
+
+  if (publicToken && isSupabaseConfigured()) {
+    const trial = await getTrialByToken(publicToken);
+    if (trial) {
+      await updateTrialStatus(trial.id, "paid", {
+        paid_at: new Date().toISOString(),
+        stripe_payment_status: "demo",
+      });
+      await updateTrialStatus(trial.id, "report_generating");
+      enqueueReportGeneration(trial.id);
+    }
   }
 
   const redirectUrl = publicToken
     ? `${origin}/r/${publicToken}?${params.toString()}`
-    : `${origin}/bazi/flow?${params.toString()}`;
+    : `${origin}/bazi/input?${params.toString()}`;
 
   return NextResponse.json({
     ok: true,

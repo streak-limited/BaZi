@@ -69,10 +69,10 @@ export async function POST(request: Request) {
 
   const successUrl = publicToken
     ? `${origin}/r/${publicToken}?paid=1&session_id={CHECKOUT_SESSION_ID}`
-    : `${origin}/bazi/flow?paid=1&session_id={CHECKOUT_SESSION_ID}`;
+    : `${origin}/bazi/intro?paid=1&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = publicToken
-    ? `${origin}/r/${publicToken}/pre-report`
-    : `${origin}/bazi/flow?step=pre-report`;
+    ? `${origin}/r/${publicToken}/result`
+    : `${origin}/bazi/input`;
 
   try {
     const session = await stripe.checkout.sessions.create({

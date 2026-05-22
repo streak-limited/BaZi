@@ -5,15 +5,16 @@ import type { ReportData } from "@/lib/report-types";
 /** Product template id — add new modals here */
 export type ModalTemplateId = "bazi_full" | (string & {});
 
-export type TrialPhase = "pre_report" | "full_report";
+/** Saved deliverable phase: result (payment teaser) | report (full 20 pages) */
+export type TrialPhase = "result" | "report";
 
 export type TrialStatus =
   | "started"
-  | "pre_report_generating"
-  | "pre_report_ready"
+  | "result_generating"
+  | "result_ready"
   | "checkout_pending"
   | "paid"
-  | "full_generating"
+  | "report_generating"
   | "completed"
   | "failed";
 
@@ -23,7 +24,11 @@ export interface ModalTemplateConfig {
   phases: TrialPhase[];
   page_count?: number;
   price_hkd?: number;
+  result_entries_ref?: string;
+  report_entries_ref?: string;
+  /** @deprecated */
   pre_report_entries_ref?: string;
+  /** @deprecated */
   full_report_entries_ref?: string;
 }
 
@@ -78,16 +83,16 @@ export interface PaymentRow {
   created_at: string;
 }
 
-/** Pre-report deliverable shape */
-export interface PreReportDeliverable {
+/** Result page deliverable (intro → input → AI result + paywall) */
+export interface ResultDeliverable {
   entries: import("@/lib/report-types").ReportEntry[];
   chart?: unknown;
   variables?: Record<string, string>;
   generatedAt: string;
 }
 
-/** Full report deliverable — same entry model as ReportData */
-export interface FullReportDeliverable {
+/** Full report deliverable — 20 pages */
+export interface ReportDeliverable {
   metadata: ReportData["metadata"];
   entries: ReportData["entries"];
   aiOutputs?: Record<string, { text: string; model?: string; updatedAt: string }>;
@@ -98,7 +103,12 @@ export interface TrialBundle {
   trial: TrialRow;
   deliverables: Partial<Record<TrialPhase, TrialDeliverableRow>>;
   payment: PaymentRow | null;
+  hubUrl: string;
+  resultUrl: string;
   reportUrl: string;
-  preReportUrl: string;
-  fullReportUrl: string;
 }
+
+/** @deprecated Use ResultDeliverable */
+export type PreReportDeliverable = ResultDeliverable;
+/** @deprecated Use ReportDeliverable */
+export type FullReportDeliverable = ReportDeliverable;

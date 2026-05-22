@@ -18,11 +18,11 @@ export const MODAL_REGISTRY: Record<string, ModalDefinition> = {
     family: "bazi",
     templateEntriesRef: "bazi_full_v1",
     config: {
-      phases: ["pre_report", "full_report"],
+      phases: ["result", "report"],
       page_count: 20,
       price_hkd: 88,
-      pre_report_entries_ref: "pre-report-analysis.json",
-      full_report_entries_ref: "ai_generated_content.json",
+      result_entries_ref: "pre-report-analysis.json",
+      report_entries_ref: "ai_generated_content.json",
     },
   },
   // Future modals — same pattern:

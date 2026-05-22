@@ -1,13 +1,13 @@
 "use client";
 
-import PreReportView from "@/app/bazi/flow/PreReportView";
-import type { PreReportPayload } from "@/lib/bazi-flow/types";
-import type { PreReportDeliverable } from "@/lib/products/types";
+import ResultView from "@/app/bazi/intro/ResultView";
+import type { ResultPayload } from "@/lib/bazi-journey/types";
+import type { ResultDeliverable } from "@/lib/products/types";
 import { useEffect, useState } from "react";
 import styles from "./r.module.css";
 
-export default function SharedPreReportClient({ token }: { token: string }) {
-  const [payload, setPayload] = useState<PreReportPayload | null>(null);
+export default function SharedResultClient({ token }: { token: string }) {
+  const [payload, setPayload] = useState<ResultPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -15,14 +15,14 @@ export default function SharedPreReportClient({ token }: { token: string }) {
       .then((r) => r.json())
       .then((json) => {
         if (json.error) throw new Error(json.error);
-        const d = json.deliverables?.pre_report?.content as
-          | PreReportDeliverable
-          | undefined;
-        if (!d?.entries) throw new Error("Pre-report 尚未生成");
+        const row =
+          json.deliverables?.result ?? json.deliverables?.pre_report;
+        const d = row?.content as ResultDeliverable | undefined;
+        if (!d?.entries) throw new Error("Result 尚未生成");
         setPayload({
-          entries: d.entries as PreReportPayload["entries"],
-          chart: d.chart as PreReportPayload["chart"],
-          variables: d.variables as PreReportPayload["variables"],
+          entries: d.entries as ResultPayload["entries"],
+          chart: d.chart as ResultPayload["chart"],
+          variables: d.variables as ResultPayload["variables"],
           generatedAt: d.generatedAt,
         });
       })
@@ -44,10 +44,10 @@ export default function SharedPreReportClient({ token }: { token: string }) {
   if (!payload) {
     return (
       <p style={{ padding: 24, color: "#fff", textAlign: "center" }}>
-        載入 pre-report…
+        載入 result…
       </p>
     );
   }
 
-  return <PreReportView payload={payload} publicToken={token} />;
+  return <ResultView payload={payload} publicToken={token} />;
 }

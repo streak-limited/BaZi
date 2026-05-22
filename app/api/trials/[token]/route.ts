@@ -24,9 +24,9 @@ export async function GET(
       deliverables: bundle.deliverables,
       payment: bundle.payment,
       urls: {
-        hub: bundle.reportUrl,
-        preReport: bundle.preReportUrl,
-        fullReport: bundle.fullReportUrl,
+        hub: bundle.hubUrl,
+        result: bundle.resultUrl,
+        report: bundle.reportUrl,
       },
     });
   } catch (err) {

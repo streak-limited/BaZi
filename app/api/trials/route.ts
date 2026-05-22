@@ -58,8 +58,8 @@ export async function POST(request: Request) {
       },
       urls: {
         hub: `${base}/r/${trial.public_token}`,
-        preReport: `${base}/r/${trial.public_token}/pre-report`,
-        fullReport: `${base}/r/${trial.public_token}/report`,
+        result: `${base}/r/${trial.public_token}/result`,
+        report: `${base}/r/${trial.public_token}/report`,
       },
     });
   } catch (err) {

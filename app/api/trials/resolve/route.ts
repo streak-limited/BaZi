@@ -28,8 +28,8 @@ export async function GET(request: Request) {
           status: trial.status,
           urls: {
             hub: `${base}/r/${trial.public_token}`,
-            preReport: `${base}/r/${trial.public_token}/pre-report`,
-            fullReport: `${base}/r/${trial.public_token}/report`,
+            result: `${base}/r/${trial.public_token}/result`,
+            report: `${base}/r/${trial.public_token}/report`,
           },
         });
       }
@@ -51,8 +51,8 @@ export async function GET(request: Request) {
             status: session.payment_status ?? "unknown",
             urls: {
               hub: `${base}/r/${token}`,
-              preReport: `${base}/r/${token}/pre-report`,
-              fullReport: `${base}/r/${token}/report`,
+              result: `${base}/r/${token}/result`,
+              report: `${base}/r/${token}/report`,
             },
             source: "stripe_metadata",
           });

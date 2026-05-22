@@ -1,19 +1,15 @@
 "use client";
 
-import { BAZI_FLOW_MEDIA } from "@/lib/bazi-flow/config";
-import styles from "./bazi-flow.module.css";
+import { BAZI_JOURNEY_MEDIA } from "@/lib/bazi-journey/config";
+import styles from "./bazi-intro.module.css";
 
-interface ImmersionStepProps {
-  onContinue: () => void;
-}
-
-export default function ImmersionStep({ onContinue }: ImmersionStepProps) {
+export default function IntroStep({ onContinue }: { onContinue: () => void }) {
   return (
     <div className={styles.narrow}>
       <div className={styles.mediaWrap}>
         <video
           className={styles.video}
-          src={BAZI_FLOW_MEDIA.immersionVideo}
+          src={BAZI_JOURNEY_MEDIA.introVideo}
           autoPlay
           muted
           playsInline

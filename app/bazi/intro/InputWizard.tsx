@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  BAZI_FLOW_MEDIA,
+  BAZI_JOURNEY_MEDIA,
   CALENDAR_OPTIONS,
   GENDER_OPTIONS,
   INPUT_STEPS,
   JOB_OPTIONS,
   RELATIONSHIP_OPTIONS,
   SEXUALITY_OPTIONS,
-} from "@/lib/bazi-flow/config";
+} from "@/lib/bazi-journey/config";
 import type { UserFormInput } from "@/lib/user-input";
-import styles from "./bazi-flow.module.css";
+import styles from "./bazi-intro.module.css";
 
 interface InputWizardProps {
   input: UserFormInput;
@@ -41,8 +41,8 @@ export default function InputWizard({
   const step = INPUT_STEPS[stepIndex];
   const videoSrc =
     step.videoIndex === 2
-      ? BAZI_FLOW_MEDIA.inputVideo2
-      : BAZI_FLOW_MEDIA.inputVideo1;
+      ? BAZI_JOURNEY_MEDIA.inputVideo2
+      : BAZI_JOURNEY_MEDIA.inputVideo1;
 
   const goNext = () => {
     if (stepIndex < INPUT_STEPS.length - 1) {

@@ -1,14 +1,9 @@
-import { queueReportReadyEmail } from "@/lib/products/email";
-import { getModalDefinition, DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
+import { enqueueReportGeneration } from "@/lib/products/report-generation";
 import {
-  getTrialById,
   isSupabaseConfigured,
   markPaymentSucceeded,
-  saveFullReportDeliverable,
   updateTrialStatus,
 } from "@/lib/products/trial-store";
-import type { FullReportDeliverable } from "@/lib/products/types";
-import { getReportData } from "@/lib/report-data";
 import { getStripe } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
@@ -51,31 +46,8 @@ export async function POST(request: Request) {
       );
 
       if (trial) {
-        await updateTrialStatus(trial.id, "full_generating");
-
-        // Placeholder full report until batch AI gen is wired — user still gets link + email
-        const modal = getModalDefinition(
-          trial.modal_template_id ?? DEFAULT_BAZI_MODAL,
-        );
-        const template = getReportData();
-        const placeholder: FullReportDeliverable = {
-          metadata: {
-            ...template.metadata,
-            notes:
-              "Full AI generation pending — template structure saved. Revisit /r/token/report after batch job.",
-          },
-          entries: template.entries,
-          aiOutputs: {},
-          generatedAt: new Date().toISOString(),
-        };
-
-        await saveFullReportDeliverable(trial.id, placeholder, {
-          stub: true,
-          modal: modal.id,
-          page_count: modal.config.page_count,
-        });
-
-        await queueReportReadyEmail(trial);
+        await updateTrialStatus(trial.id, "report_generating");
+        enqueueReportGeneration(trial.id);
       }
     }
   }

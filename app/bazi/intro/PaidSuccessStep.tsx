@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import styles from "./bazi-flow.module.css";
+import styles from "./bazi-intro.module.css";
 
 interface ReportUrls {
   hub: string;
-  preReport: string;
-  fullReport: string;
+  result: string;
+  report: string;
 }
 
 export default function PaidSuccessStep({
@@ -35,8 +35,8 @@ export default function PaidSuccessStep({
       typeof window !== "undefined" ? window.location.origin : "";
     return {
       hub: reportHubUrl ?? `${origin}/r/${token}`,
-      preReport: `${origin}/r/${token}/pre-report`,
-      fullReport: `${origin}/r/${token}/report`,
+      result: `${origin}/r/${token}/result`,
+      report: `${origin}/r/${token}/report`,
     };
   }, [publicToken, reportHubUrl]);
 
@@ -105,7 +105,7 @@ export default function PaidSuccessStep({
             <code className={styles.reportLinkCode}>{active.hub}</code>
           </div>
           <Link
-            href={active.fullReport}
+            href={active.report}
             className={styles.primaryBtn}
             style={{
               textDecoration: "none",
@@ -125,11 +125,11 @@ export default function PaidSuccessStep({
             報告首頁
           </Link>
           <Link
-            href={active.preReport}
+            href={active.result}
             className={styles.ghostBtn}
             style={{ display: "block", textAlign: "center", maxWidth: 320 }}
           >
-            查看 Pre-report
+            查看 Result
           </Link>
         </>
       )}

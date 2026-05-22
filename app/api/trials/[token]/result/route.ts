@@ -1,10 +1,10 @@
 import {
   getTrialByToken,
-  savePreReportDeliverable,
+  saveResultDeliverable,
   updateTrialStatus,
   isSupabaseConfigured,
 } from "@/lib/products/trial-store";
-import type { PreReportDeliverable } from "@/lib/products/types";
+import type { ResultDeliverable } from "@/lib/products/types";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ export async function PUT(
   }
 
   const { token } = await context.params;
-  let body: { deliverable: PreReportDeliverable; aiMeta?: Record<string, unknown> };
+  let body: { deliverable: ResultDeliverable; aiMeta?: Record<string, unknown> };
   try {
     body = await request.json();
   } catch {
@@ -31,8 +31,8 @@ export async function PUT(
       return NextResponse.json({ error: "Trial not found" }, { status: 404 });
     }
 
-    await savePreReportDeliverable(trial.id, body.deliverable, body.aiMeta);
-    return NextResponse.json({ ok: true, status: "pre_report_ready" });
+    await saveResultDeliverable(trial.id, body.deliverable, body.aiMeta);
+    return NextResponse.json({ ok: true, status: "result_ready" });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Save failed";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -60,8 +60,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Trial not found" }, { status: 404 });
   }
 
-  if (body.status === "pre_report_generating") {
-    await updateTrialStatus(trial.id, "pre_report_generating");
+  if (body.status === "result_generating") {
+    await updateTrialStatus(trial.id, "result_generating");
   }
 
   return NextResponse.json({ ok: true });

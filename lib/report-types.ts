@@ -32,6 +32,7 @@ export interface ReportMetadata {
   section_summary?: Record<string, PageSummary>;
   by_type?: Record<ContentType, number>;
   notes?: string;
+  demo_mode?: boolean;
 }
 
 export interface ReportData {

@@ -44,6 +44,20 @@
   text-decoration: none;
 }
 
+.btnSecondary {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  text-align: center;
+  text-decoration: none;
+}
+
 .btnGhost {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -59,6 +73,100 @@
   background: rgba(120, 0, 40, 0.4);
   border-radius: 8px;
   margin-bottom: 16px;
+}
+
+/* Payment success hub */
+.successHero {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.successIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.demoPill {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.35);
+  border: 1px solid rgba(167, 139, 250, 0.5);
+  margin-top: 8px;
+}
+
+.cardGenerating {
+  text-align: center;
+}
+
+.cardReady {
+  text-align: center;
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #c4b5fd;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.generatingTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.generatingSub {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.readyTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #86efac;
+  margin: 0 0 8px;
+}
+
+.cardLabel {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0 0 8px;
+}
+
+.linkCode {
+  display: block;
+  font-size: 0.78rem;
+  word-break: break-all;
+  line-height: 1.45;
+}
+
+.footerHint {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  text-align: center;
+  margin-top: 24px;
 }
 
 /* Full report reader */

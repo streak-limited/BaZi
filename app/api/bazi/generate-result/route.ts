@@ -1,17 +1,21 @@
-import { buildPreReport } from "@/lib/bazi-flow/build-pre-report";
-import type { PreReportDeliverable } from "@/lib/products/types";
+import { buildResult } from "@/lib/bazi-journey/build-result";
+import { buildDemoResultPayload } from "@/lib/result-demo";
+import type { ResultDeliverable } from "@/lib/products/types";
 import {
   getTrialByToken,
   isSupabaseConfigured,
-  savePreReportDeliverable,
+  saveResultDeliverable,
   updateTrialStatus,
 } from "@/lib/products/trial-store";
 import { DEFAULT_USER_INPUT, type UserFormInput } from "@/lib/user-input";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const preferredRegion = ["iad1"];
 export const maxDuration = 120;
+
+function useLiveAi(): boolean {
+  return process.env.USE_LIVE_AI_RESULT === "1";
+}
 
 export async function POST(request: Request) {
   let body: {
@@ -34,31 +38,37 @@ export async function POST(request: Request) {
     if (publicToken && isSupabaseConfigured()) {
       const trial = await getTrialByToken(publicToken);
       if (trial) {
-        await updateTrialStatus(trial.id, "pre_report_generating");
+        await updateTrialStatus(trial.id, "result_generating");
       }
     }
 
-    const payload = await buildPreReport(userInput);
+    const payload = useLiveAi()
+      ? await buildResult(userInput)
+      : buildDemoResultPayload(userInput);
 
     if (publicToken && isSupabaseConfigured()) {
       const trial = await getTrialByToken(publicToken);
       if (trial) {
-        const deliverable: PreReportDeliverable = {
+        const deliverable: ResultDeliverable = {
           entries: payload.entries,
           chart: payload.chart,
           variables: payload.variables,
           generatedAt: payload.generatedAt,
         };
-        await savePreReportDeliverable(trial.id, deliverable, {
-          provider: process.env.AI_PROVIDER ?? "gemini",
+        await saveResultDeliverable(trial.id, deliverable, {
+          demo: !useLiveAi(),
+          provider: useLiveAi() ? process.env.AI_PROVIDER ?? "gemini" : "demo_json",
         });
       }
     }
 
-    return NextResponse.json(payload);
+    return NextResponse.json({
+      ...payload,
+      demo: !useLiveAi(),
+    });
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Pre-report generation failed";
+      err instanceof Error ? err.message : "Result generation failed";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

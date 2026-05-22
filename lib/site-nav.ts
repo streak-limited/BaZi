@@ -15,19 +15,24 @@ export const SITE_NAV_GROUPS: SiteNavGroup[] = [
     title: "八字",
     items: [
       {
-        href: "/bazi/flow",
+        href: "/bazi/intro",
         label: "開始八字",
-        description: "沉浸 → 輸入 → AI pre-report → Stripe 付款",
+        description: "Intro → Input → Result → Report",
+      },
+      {
+        href: "/bazi/input",
+        label: "輸入命盤",
+        description: "8 項資料 → AI result",
       },
       {
         href: "/bazi/report",
-        label: "完整報告",
-        description: "20 頁 AI 報告 · 命主 · Gemini 生成",
+        label: "Report 開發台",
+        description: "20 頁 · 命主 · Gemini（Turso 開發用）",
       },
       {
-        href: "/bazi/pre-report",
-        label: "Pre-report 拆解",
-        description: "範山道令導流單頁 · 內容拆解（開發用）",
+        href: "/bazi/result",
+        label: "Result 模板拆解",
+        description: "導流 + 付款頁靜態模板（開發用）",
       },
     ],
   },

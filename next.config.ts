@@ -10,19 +10,49 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/bazi",
+        destination: "/bazi/intro",
+        permanent: false,
+      },
+      {
+        source: "/bazi/flow",
+        destination: "/bazi/intro",
+        permanent: true,
+      },
+      {
+        source: "/flow",
+        destination: "/bazi/intro",
+        permanent: true,
+      },
+      {
+        source: "/r/:token/pre-report",
+        destination: "/r/:token/result",
+        permanent: true,
+      },
+      {
+        source: "/pre-report",
+        destination: "/bazi/result",
+        permanent: true,
+      },
+      {
+        source: "/bazi/pre-report",
+        destination: "/bazi/result",
+        permanent: true,
+      },
+      {
         source: "/report",
         destination: "/bazi/report",
         permanent: true,
       },
       {
-        source: "/pre-report",
-        destination: "/bazi/pre-report",
+        source: "/api/bazi-flow/generate-pre-report",
+        destination: "/api/bazi/generate-result",
         permanent: true,
       },
       {
-        source: "/bazi",
-        destination: "/bazi/flow",
-        permanent: false,
+        source: "/api/trials/:token/pre-report",
+        destination: "/api/trials/:token/result",
+        permanent: true,
       },
     ];
   },

@@ -1,14 +1,25 @@
 import { getReportData } from "@/lib/report-data";
-import type { FullReportDeliverable } from "@/lib/products/types";
+import type { ReportDeliverable } from "@/lib/products/types";
 import type { ReportData, ReportEntry } from "@/lib/report-types";
 
 /** Merge template entries with saved AI outputs for read-only report view */
-export function mergeFullReportForDisplay(
-  deliverable: FullReportDeliverable | null,
+export function mergeReportForDisplay(
+  deliverable: ReportDeliverable | null,
 ): ReportData {
   const template = getReportData();
   if (!deliverable?.entries?.length) {
     return template;
+  }
+
+  if (
+    deliverable.metadata?.demo_mode === true ||
+    (deliverable.entries.length >= 50 &&
+      deliverable.entries.some((e) => e.type === "ai" && e.content.length > 100))
+  ) {
+    return {
+      metadata: { ...template.metadata, ...deliverable.metadata },
+      entries: deliverable.entries,
+    };
   }
 
   const aiByKey = deliverable.aiOutputs ?? {};
@@ -35,6 +46,9 @@ export function mergeFullReportForDisplay(
     entries,
   };
 }
+
+/** @deprecated Use mergeReportForDisplay */
+export const mergeFullReportForDisplay = mergeReportForDisplay;
 
 export function pageNumbersFromReport(data: ReportData): number[] {
   const pages = new Set<number>();
