@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 /**
- * Apply supabase/migrations/001_product_flow.sql via direct Postgres.
+ * Apply all supabase/migrations/*.sql in order via DATABASE_URL (pooler OK).
  *
- * Requires DATABASE_URL in .env.local (Supabase Dashboard → Settings → Database
- * → Connection string → URI, mode Session or Transaction).
- *
- *   npm run db:migrate
+ *   npm run db:migrate:all
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -47,24 +44,27 @@ if (!databaseUrl) {
   console.error(`
 Missing DATABASE_URL in .env.local.
 
-Get it from Supabase Dashboard:
-  Project → Settings → Database → Connection string → URI
-  (use the password you set when creating the project)
+Supabase Dashboard → Settings → Database → Connection string → URI
+(use pooler host, port 6543)
 
-Example:
-  DATABASE_URL=postgresql://postgres.[ref]:[YOUR-PASSWORD]@aws-0-....pooler.supabase.com:6543/postgres
-
-Or run the SQL manually in Dashboard → SQL Editor:
-  supabase/migrations/001_product_flow.sql
+Then: npm run db:migrate:all
 `);
   process.exit(1);
 }
 
-const sqlPath = resolve(root, "supabase/migrations/001_product_flow.sql");
-const sql = readFileSync(sqlPath, "utf8");
+const migrationsDir = resolve(root, "supabase/migrations");
+const onlyFile = process.argv[2]?.trim();
+const files = readdirSync(migrationsDir)
+  .filter((f) => f.endsWith(".sql"))
+  .filter((f) => !onlyFile || f === onlyFile || f.includes(onlyFile))
+  .sort();
+
+if (files.length === 0) {
+  console.error("No migration files matched.", onlyFile ?? "");
+  process.exit(1);
+}
 
 const { default: pg } = await import("pg");
-
 const client = new pg.Client({
   connectionString: databaseUrl,
   ssl: { rejectUnauthorized: false },
@@ -72,12 +72,17 @@ const client = new pg.Client({
 
 try {
   await client.connect();
-  console.log("Applying", sqlPath);
-  await client.query(sql);
+  for (const file of files) {
+    const path = resolve(migrationsDir, file);
+    const sql = readFileSync(path, "utf8");
+    console.log("Applying", file, "…");
+    await client.query(sql);
+    console.log("  OK");
+  }
   const { rows } = await client.query(
-    "select id, display_name from public.models order by id",
+    "select id, slug, display_name from public.models order by id",
   );
-  console.log("OK — models:", rows);
+  console.log("\nmodels:", rows);
 } catch (err) {
   console.error("Migration failed:", err.message);
   process.exit(1);

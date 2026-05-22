@@ -1,11 +1,11 @@
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/server";
-import { listActiveModals } from "@/lib/products/modal-store";
+import { listActiveModels } from "@/lib/products/model-store";
 
 export interface AdminTrialRow {
   id: string;
   public_token: string;
-  modal_template_id: string;
-  modal_display_name: string;
+  model_id: string;
+  model_display_name: string;
   email: string;
   status: string;
   created_at: string;
@@ -33,12 +33,12 @@ export interface AdminEmailRow {
 }
 
 export async function fetchAdminDashboard() {
-  const modals = await listActiveModals();
+  const models = await listActiveModels();
 
   if (!isSupabaseConfigured()) {
     return {
       configured: false,
-      modals,
+      models,
       trials: [] as AdminTrialRow[],
       payments: [] as AdminPaymentRow[],
       emails: [] as AdminEmailRow[],
@@ -47,27 +47,58 @@ export async function fetchAdminDashboard() {
   }
 
   const db = getSupabaseAdmin();
-  const modalName = new Map(modals.map((m) => [m.id, m.display_name]));
+  const modelName = new Map(models.map((m) => [m.id, m.display_name]));
 
   const { data: trialsRaw, error: te } = await db
     .from("trials")
-    .select("id, public_token, modal_template_id, email, status, created_at, paid_at")
+    .select("id, public_token, model_id, email, status, created_at, paid_at")
     .order("created_at", { ascending: false })
     .limit(80);
-  if (te) throw new Error(te.message);
+
+  if (te) {
+    const legacy = await db
+      .from("trials")
+      .select(
+        "id, public_token, modal_template_id, email, status, created_at, paid_at",
+      )
+      .order("created_at", { ascending: false })
+      .limit(80);
+    if (legacy.error) throw new Error(legacy.error.message);
+    const trials: AdminTrialRow[] = (legacy.data ?? []).map((r) => ({
+      id: String(r.id),
+      public_token: String(r.public_token),
+      model_id: String(r.modal_template_id),
+      model_display_name:
+        modelName.get(String(r.modal_template_id)) ??
+        String(r.modal_template_id),
+      email: String(r.email ?? ""),
+      status: String(r.status),
+      created_at: String(r.created_at),
+      paid_at: r.paid_at ? String(r.paid_at) : null,
+    }));
+    return buildRest(db, models, trials);
+  }
 
   const trials: AdminTrialRow[] = (trialsRaw ?? []).map((r) => ({
     id: String(r.id),
     public_token: String(r.public_token),
-    modal_template_id: String(r.modal_template_id),
-    modal_display_name:
-      modalName.get(String(r.modal_template_id)) ?? String(r.modal_template_id),
+    model_id: String(r.model_id),
+    model_display_name:
+      modelName.get(String(r.model_id)) ?? String(r.model_id),
     email: String(r.email ?? ""),
     status: String(r.status),
     created_at: String(r.created_at),
     paid_at: r.paid_at ? String(r.paid_at) : null,
   }));
 
+  return buildRest(db, models, trials);
+}
+
+async function buildRest(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  models: Awaited<ReturnType<typeof listActiveModels>>,
+  trials: AdminTrialRow[],
+) {
   const { data: paymentsRaw, error: pe } = await db
     .from("payments")
     .select(
@@ -78,7 +109,10 @@ export async function fetchAdminDashboard() {
   if (pe) throw new Error(pe.message);
 
   const payments: AdminPaymentRow[] = (paymentsRaw ?? []).map((r) => {
-    const trialJoin = r.trials as { public_token?: string } | { public_token?: string }[] | null;
+    const trialJoin = r.trials as
+      | { public_token?: string }
+      | { public_token?: string }[]
+      | null;
     const token = Array.isArray(trialJoin)
       ? trialJoin[0]?.public_token
       : trialJoin?.public_token;
@@ -86,7 +120,9 @@ export async function fetchAdminDashboard() {
       id: String(r.id),
       trial_id: String(r.trial_id),
       public_token: token ? String(token) : null,
-      stripe_session_id: r.stripe_session_id ? String(r.stripe_session_id) : null,
+      stripe_session_id: r.stripe_session_id
+        ? String(r.stripe_session_id)
+        : null,
       amount_cents: r.amount_cents != null ? Number(r.amount_cents) : null,
       currency: String(r.currency ?? "hkd"),
       status: String(r.status),
@@ -119,7 +155,7 @@ export async function fetchAdminDashboard() {
 
   return {
     configured: true,
-    modals,
+    models,
     trials,
     payments,
     emails,

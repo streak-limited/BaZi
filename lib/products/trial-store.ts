@@ -1,7 +1,7 @@
 import { getAppBaseUrl, getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { BirthPlace } from "@/lib/astrology/types";
 import type {
-  ModalTemplateId,
+  ModelId,
   PaymentRow,
   PaymentStatus,
   ReportDeliverable,
@@ -28,7 +28,7 @@ function rowToTrial(row: Record<string, unknown>): TrialRow {
   return {
     id: String(row.id),
     public_token: String(row.public_token),
-    modal_template_id: String(row.modal_template_id) as ModalTemplateId,
+    model_id: String(row.model_id ?? row.modal_template_id) as ModelId,
     email: String(row.email ?? ""),
     user_input: row.user_input as UserFormInput,
     birth_place: (row.birth_place as BirthPlace | null) ?? null,
@@ -60,7 +60,7 @@ function urlsForToken(publicToken: string) {
 }
 
 export async function createTrial(params: {
-  modalTemplateId: ModalTemplateId;
+  modelId: ModelId;
   userInput: UserFormInput;
   email?: string;
   birthPlace?: BirthPlace | null;
@@ -69,21 +69,31 @@ export async function createTrial(params: {
   const db = getSupabaseAdmin();
   const public_token = newPublicToken();
 
-  const { data, error } = await db
+  const base = {
+    public_token,
+    email: params.email?.trim() || params.userInput.email?.trim() || "",
+    user_input: params.userInput,
+    birth_place: params.birthPlace ?? null,
+    status: "started" as const,
+    legacy_subject_id: params.legacySubjectId ?? null,
+  };
+
+  let result = await db
     .from("trials")
-    .insert({
-      public_token,
-      modal_template_id: params.modalTemplateId,
-      email: params.email?.trim() || params.userInput.email?.trim() || "",
-      user_input: params.userInput,
-      birth_place: params.birthPlace ?? null,
-      status: "started",
-      legacy_subject_id: params.legacySubjectId ?? null,
-    })
+    .insert({ ...base, model_id: params.modelId })
     .select()
     .single();
 
-  if (error) throw new Error(error.message);
+  if (result.error) {
+    result = await db
+      .from("trials")
+      .insert({ ...base, modal_template_id: params.modelId })
+      .select()
+      .single();
+  }
+
+  if (result.error) throw new Error(result.error.message);
+  const data = result.data;
   return rowToTrial(data as Record<string, unknown>);
 }
 

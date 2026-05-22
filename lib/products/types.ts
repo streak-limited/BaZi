@@ -2,8 +2,14 @@ import type { UserFormInput } from "@/lib/user-input";
 import type { BirthPlace } from "@/lib/astrology/types";
 import type { ReportData } from "@/lib/report-types";
 
-/** Product template id — add new modals here */
-export type ModalTemplateId = "bazi_full" | (string & {});
+/** Product model id — add new models in `models` table */
+export type ModelId = "bazi_full" | (string & {});
+
+export interface ProductTag {
+  id: string;
+  label: string;
+  sort_order: number;
+}
 
 /** Saved deliverable phase: result (payment teaser) | report (full 20 pages) */
 export type TrialPhase = "result" | "report";
@@ -20,13 +26,13 @@ export type TrialStatus =
 
 export type PaymentStatus = "pending" | "succeeded" | "failed" | "refunded";
 
-export interface ModalTemplateConfig {
+export interface ModelConfig {
   phases: TrialPhase[];
   page_count?: number;
   price_hkd?: number;
   result_entries_ref?: string;
   report_entries_ref?: string;
-  /** UI bundle key — maps to lib/modals/ui-registry */
+  /** UI bundle key — maps to lib/models/ui-registry */
   ui_key?: string;
   media?: {
     introVideo?: string;
@@ -39,19 +45,26 @@ export interface ModalTemplateConfig {
     inputHeaderTitle?: string;
     inputHeaderSubtitle?: string;
   };
+  /** Home page product card (tags live in `tags` + `model_tags` tables) */
+  listing?: {
+    image?: string;
+    description?: string;
+    view_count?: number;
+    badge?: string;
+  };
   /** @deprecated */
   pre_report_entries_ref?: string;
   /** @deprecated */
   full_report_entries_ref?: string;
 }
 
-export interface ModalTemplateRow {
-  id: ModalTemplateId;
+export interface ModelRow {
+  id: ModelId;
   slug: string;
   display_name: string;
   family: string;
   version: number;
-  config: ModalTemplateConfig;
+  config: ModelConfig;
   template_entries_ref: string | null;
   is_active: boolean;
 }
@@ -59,7 +72,7 @@ export interface ModalTemplateRow {
 export interface TrialRow {
   id: string;
   public_token: string;
-  modal_template_id: ModalTemplateId;
+  model_id: ModelId;
   email: string;
   user_input: UserFormInput;
   birth_place: BirthPlace | null;
@@ -96,7 +109,6 @@ export interface PaymentRow {
   created_at: string;
 }
 
-/** Result page deliverable (intro → input → AI result + paywall) */
 export interface ResultDeliverable {
   entries: import("@/lib/report-types").ReportEntry[];
   chart?: unknown;
@@ -104,7 +116,6 @@ export interface ResultDeliverable {
   generatedAt: string;
 }
 
-/** Full report deliverable — 20 pages */
 export interface ReportDeliverable {
   metadata: ReportData["metadata"];
   entries: ReportData["entries"];

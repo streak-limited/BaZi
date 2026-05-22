@@ -1,10 +1,10 @@
 import { getAppBaseUrl } from "@/lib/supabase/server";
 
-export function modalIntroPath(slug: string): string {
+export function modelIntroPath(slug: string): string {
   return `/m/${slug}/intro`;
 }
 
-export function modalInputPath(slug: string): string {
+export function modelInputPath(slug: string): string {
   return `/m/${slug}/input`;
 }
 

@@ -1,0 +1,86 @@
+.filterBar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 39;
+  background: #000;
+  padding: 8px 0;
+}
+
+.filterBar::before {
+  content: "";
+  display: block;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.filterScroll {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filterScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.pill,
+.pillActive {
+  flex-shrink: 0;
+  border-radius: 24px;
+  padding: 6px 16px;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.pill {
+  border: 1px solid #27272a;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pill:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pillActive {
+  border: 1px solid #fafafa;
+  background: #fafafa;
+  color: #000;
+  font-weight: 600;
+}
+
+.mainWithFilter {
+  padding-top: 40px;
+}
+
+.mainNoFilter {
+  padding-top: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px dashed #27272a;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  margin-top: 20px;
+}

@@ -1,13 +1,13 @@
-import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
-import { getModalBySlug } from "@/lib/products/modal-store";
+import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
+import { getModelBySlug } from "@/lib/products/model-store";
 import {
   createTrial,
   isSupabaseConfigured,
 } from "@/lib/products/trial-store";
-import type { ModalTemplateId } from "@/lib/products/types";
 import { getAppBaseUrl } from "@/lib/supabase/server";
 import { DEFAULT_USER_INPUT, type UserFormInput } from "@/lib/user-input";
 import type { BirthPlace } from "@/lib/astrology/types";
+import type { ModelId } from "@/lib/products/types";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -24,8 +24,8 @@ export async function POST(request: Request) {
   }
 
   let body: {
-    modalSlug?: string;
-    modalTemplateId?: string;
+    modelSlug?: string;
+    modelId?: string;
     userInput?: Partial<UserFormInput>;
     email?: string;
     birthPlace?: BirthPlace | null;
@@ -42,21 +42,21 @@ export async function POST(request: Request) {
     ...body.userInput,
   };
 
-  let modalTemplateId = (body.modalTemplateId ?? DEFAULT_BAZI_MODAL) as ModalTemplateId;
-  if (body.modalSlug?.trim()) {
-    const modal = await getModalBySlug(body.modalSlug.trim());
-    if (!modal) {
+  let modelId = (body.modelId ?? DEFAULT_BAZI_MODEL) as ModelId;
+  if (body.modelSlug?.trim()) {
+    const model = await getModelBySlug(body.modelSlug.trim());
+    if (!model) {
       return NextResponse.json(
-        { error: `Unknown modal slug: ${body.modalSlug}` },
+        { error: `Unknown model slug: ${body.modelSlug}` },
         { status: 404 },
       );
     }
-    modalTemplateId = modal.id;
+    modelId = model.id;
   }
 
   try {
     const trial = await createTrial({
-      modalTemplateId,
+      modelId,
       userInput,
       email: body.email ?? userInput.email,
       birthPlace: body.birthPlace ?? null,
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
         id: trial.id,
         publicToken: trial.public_token,
         status: trial.status,
-        modalTemplateId: trial.modal_template_id,
+        modelId: trial.model_id,
       },
       urls: {
         hub: `${base}/r/${trial.public_token}`,

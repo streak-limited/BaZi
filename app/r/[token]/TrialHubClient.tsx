@@ -9,7 +9,7 @@ interface TrialApi {
   trial: {
     status: string;
     email: string;
-    modal_template_id: string;
+    model_id: string;
     user_input: { name?: string };
   };
   urls: { hub: string; result: string; report: string };
@@ -140,7 +140,7 @@ export default function TrialHubClient({ token }: { token: string }) {
       <div className={styles.inner}>
         <h1 className={styles.title}>{name} 的命理報告</h1>
         <p className={styles.sub}>
-          模組：{data?.trial.modal_template_id ?? "—"} · 狀態：
+          模組：{data?.trial.model_id ?? "—"} · 狀態：
           <span className={styles.status}> {status || "載入中…"}</span>
         </p>
 

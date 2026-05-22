@@ -1,0 +1,85 @@
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 344 / 284;
+  background: #121212;
+}
+
+.image {
+  object-fit: cover;
+  object-position: center 35%;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #2a3441 0%, #121212 100%);
+}
+
+.gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 18, 18, 0) 40%,
+    rgba(18, 18, 18, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 16px;
+  text-align: center;
+  z-index: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: pre-line;
+}
+
+.description {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: pre-line;
+}
+
+.meta {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.badge {
+  white-space: nowrap;
+}
+
+.views {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}

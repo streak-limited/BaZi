@@ -1,6 +1,6 @@
-import { getModalById } from "@/lib/products/modal-store";
-import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
-import { modalInputPath } from "@/lib/modals/paths";
+import { getModelById } from "@/lib/products/model-store";
+import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
+import { modelInputPath } from "@/lib/models/paths";
 import {
   getTrialById,
   getTrialByToken,
@@ -51,8 +51,8 @@ export async function POST(request: Request) {
 
   let trialId = body.trialId?.trim();
   let publicToken = body.publicToken?.trim();
-  let modalTemplateId = DEFAULT_BAZI_MODAL;
-  let modalSlug = "bazi-full-report";
+  let modelId = DEFAULT_BAZI_MODEL;
+  let modelSlug = "bazi-full-report";
 
   if (isSupabaseConfigured() && (trialId || publicToken)) {
     const trial = publicToken
@@ -65,29 +65,29 @@ export async function POST(request: Request) {
     }
     trialId = trial.id;
     publicToken = trial.public_token;
-    modalTemplateId = trial.modal_template_id;
-    const modal = await getModalById(trial.modal_template_id);
-    if (modal) modalSlug = modal.slug;
+    modelId = trial.model_id;
+    const model = await getModelById(trial.model_id);
+    if (model) modelSlug = model.slug;
   }
 
-  const modal =
-    (await getModalById(modalTemplateId)) ??
-    (await getModalById(DEFAULT_BAZI_MODAL));
+  const model =
+    (await getModelById(modelId)) ??
+    (await getModelById(DEFAULT_BAZI_MODEL));
 
   const priceId = process.env.STRIPE_PRICE_ID?.trim();
   const amountHkd =
-    modal?.config.price_hkd ?? getStripeAmountHkd();
+    model?.config.price_hkd ?? getStripeAmountHkd();
   const productName =
     process.env.STRIPE_PRODUCT_NAME?.trim() ??
-    modal?.display_name ??
+    model?.display_name ??
     "八字完整命理報告";
 
   const successUrl = publicToken
     ? `${origin}/r/${publicToken}?paid=1&session_id={CHECKOUT_SESSION_ID}`
-    : `${origin}/m/${modalSlug}/input?paid=1&session_id={CHECKOUT_SESSION_ID}`;
+    : `${origin}/m/${modelSlug}/input?paid=1&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = publicToken
     ? `${origin}/r/${publicToken}/result`
-    : `${origin}${modalInputPath(modalSlug)}`;
+    : `${origin}${modelInputPath(modelSlug)}`;
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -110,8 +110,8 @@ export async function POST(request: Request) {
         subjectId: body.subjectId?.trim() ?? "",
         trial_id: trialId ?? "",
         public_token: publicToken ?? "",
-        modal_template_id: modalTemplateId,
-        product: modalSlug,
+        model_id: modelId,
+        product: modelSlug,
       },
     });
 

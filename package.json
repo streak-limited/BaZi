@@ -9,6 +9,12 @@
     "lint": "eslint",
     "setup:astrology": "bash scripts/setup-astrology-python.sh",
     "db:migrate": "node scripts/migrate-product-flow.mjs",
+    "db:migrate:all": "node scripts/apply-sql-migrations.mjs",
+    "db:migrate:ui": "node scripts/apply-sql-migrations.mjs 003_modal_ui_config.sql",
+    "db:migrate:listing": "node scripts/apply-sql-migrations.mjs 004_modal_listing.sql",
+    "db:migrate:tags": "node scripts/apply-sql-migrations.mjs 005_modal_tags.sql",
+    "db:migrate:dummy-images": "node scripts/apply-sql-migrations.mjs 006_dummy_listing_images.sql",
+    "db:migrate:models": "node scripts/apply-sql-migrations.mjs 007_rename_models_and_tags.sql",
     "db:migrate:check": "node scripts/check-supabase-tables.mjs"
   },
   "dependencies": {

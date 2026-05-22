@@ -21,7 +21,7 @@ Optional for CLI / automated migrations:
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **SQL Editor**.
 2. New query → paste entire file `supabase/migrations/001_product_flow.sql`.
 3. **Run**.
-4. Table Editor should show: `modal_templates`, `trials`, `trial_deliverables`, `payments`, `email_log`.
+4. Table Editor should show: `models`, `tags`, `model_tags`, `trials`, `trial_deliverables`, `payments`, `email_log`.
 
 ### Option B — npm script (repeatable)
 
@@ -140,6 +140,11 @@ supabase db push
 | `db push` says nothing to push | Migration already applied; check Table Editor |
 | `config.toml` missing | Run `supabase init` in repo root |
 | Push fails on pooler / SSL | Use Dashboard SQL Editor once, or `npm run db:migrate` with `DATABASE_URL` |
+| `read: can't assign requested address` (CLI → `:5432`) | CLI often uses **direct** Postgres (port 5432). On VPN / corporate network / some ISPs this fails. **Workarounds:** (1) Disconnect VPN and retry `supabase db push`. (2) Paste migrations in **SQL Editor** (fastest), especially `007_rename_models_and_tags.sql`. (3) `npm run db:migrate:models` with pooler `DATABASE_URL`. (4) `supabase db push --db-url "$DATABASE_URL"`. |
+
+After 001–006, run **`npm run db:migrate:models`** (or SQL Editor → `007_rename_models_and_tags.sql`) to rename `modal_templates` → `models` and create `tags` / `model_tags`.
+
+**Note:** `supabase push` is not a valid command — use `supabase db push`.
 
 ### CLI vs service role key
 

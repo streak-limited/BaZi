@@ -1,10 +1,10 @@
 "use client";
 
-import type { ModalIntroProps } from "@/lib/modals/ui-registry";
-import styles from "@/components/modals/bazi-v1/modal-journey.module.css";
+import type { ModelIntroProps } from "@/lib/models/ui-registry";
+import styles from "@/components/models/bazi-v1/model-journey.module.css";
 
-export default function GenericIntroStep({ modal, onContinue }: ModalIntroProps) {
-  const { media, copy } = modal.config;
+export default function GenericIntroStep({ model, onContinue }: ModelIntroProps) {
+  const { media, copy } = model.config;
   return (
     <div className={styles.narrow}>
       {media.introVideo ? (

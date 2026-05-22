@@ -1,5 +1,5 @@
-import ModalInputPage from "@/components/modals/ModalInputPage";
-import { getModalBySlug } from "@/lib/products/modal-store";
+import ModelInputPage from "@/components/models/ModelInputPage";
+import { getModelBySlug } from "@/lib/products/model-store";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -10,13 +10,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const modal = await getModalBySlug(slug);
+  const model = await getModelBySlug(slug);
   return {
-    title: modal ? `輸入 · ${modal.display_name}` : "輸入",
-    description: modal?.config.copy?.inputHeaderSubtitle ?? "輸入出生資料",
+    title: model ? `輸入 · ${model.display_name}` : "輸入",
+    description: model?.config.copy?.inputHeaderSubtitle ?? "輸入出生資料",
   };
 }
 
-export default function ModalInputRoutePage() {
-  return <ModalInputPage />;
+export default function ModelInputRoutePage() {
+  return <ModelInputPage />;
 }

@@ -40,7 +40,12 @@ if (!url || !key) {
 }
 
 const db = createClient(url, key);
-const { data, error } = await db.from("modal_templates").select("id, display_name");
+let { data, error } = await db.from("models").select("id, display_name");
+if (error) {
+  const legacy = await db.from("modal_templates").select("id, display_name");
+  data = legacy.data;
+  error = legacy.error;
+}
 
 if (error) {
   console.error("Not ready:", error.message);
@@ -48,4 +53,4 @@ if (error) {
   process.exit(1);
 }
 
-console.log("Supabase OK — modal_templates:", data);
+console.log("Supabase OK — models:", data);

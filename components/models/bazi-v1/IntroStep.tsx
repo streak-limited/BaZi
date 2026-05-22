@@ -1,11 +1,11 @@
 "use client";
 
-import type { ModalTemplate } from "@/lib/products/modal-store";
-import type { ModalIntroProps } from "@/lib/modals/ui-registry";
-import styles from "./modal-journey.module.css";
+import type { ProductModel } from "@/lib/products/model-store";
+import type { ModelIntroProps } from "@/lib/models/ui-registry";
+import styles from "./model-journey.module.css";
 
-export default function BaziIntroStep({ modal, onContinue }: ModalIntroProps) {
-  const { media, copy } = modal.config;
+export default function BaziIntroStep({ model, onContinue }: ModelIntroProps) {
+  const { media, copy } = model.config;
   return (
     <div className={styles.narrow}>
       <div className={styles.mediaWrap}>

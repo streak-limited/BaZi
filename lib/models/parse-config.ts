@@ -1,37 +1,48 @@
-import type { ModalTemplateConfig } from "@/lib/products/types";
+import { resolveListingImage } from "@/lib/models/listing-image";
+import type { ModelConfig } from "@/lib/products/types";
 
 const DEFAULT_MEDIA_BASE =
   "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw";
 
-export interface ModalMediaConfig {
+export interface ModelMediaConfig {
   introVideo?: string;
   inputVideo1?: string;
   inputVideo2?: string;
 }
 
-export interface ModalCopyConfig {
+export interface ModelCopyConfig {
   introTitle?: string;
   introSubtitle?: string;
   inputHeaderTitle?: string;
   inputHeaderSubtitle?: string;
 }
 
-export interface ParsedModalConfig extends ModalTemplateConfig {
-  ui_key: string;
-  media: ModalMediaConfig;
-  copy: ModalCopyConfig;
+export interface ModelListingConfig {
+  image?: string;
+  description?: string;
+  view_count?: number;
+  badge?: string;
 }
 
-export function parseModalConfig(
-  raw: ModalTemplateConfig & {
+export interface ParsedModelConfig extends ModelConfig {
+  ui_key: string;
+  media: ModelMediaConfig;
+  copy: ModelCopyConfig;
+  listing: ModelListingConfig;
+}
+
+export function parseModelConfig(
+  raw: ModelConfig & {
     ui_key?: string;
-    media?: ModalMediaConfig;
-    copy?: ModalCopyConfig;
+    media?: ModelMediaConfig;
+    copy?: ModelCopyConfig;
+    listing?: ModelListingConfig;
   },
-  modalId: string,
-): ParsedModalConfig {
-  const ui_key = raw.ui_key ?? modalId;
-  const media: ModalMediaConfig = {
+  modelId: string,
+  slug?: string,
+): ParsedModelConfig {
+  const ui_key = raw.ui_key ?? modelId;
+  const media: ModelMediaConfig = {
     introVideo:
       raw.media?.introVideo ??
       `${DEFAULT_MEDIA_BASE}/immersion/mzmudang_immersion_1.mp4`,
@@ -43,7 +54,7 @@ export function parseModalConfig(
       `${DEFAULT_MEDIA_BASE}/input/mzmudang_input_video_2.mp4`,
   };
 
-  const copy: ModalCopyConfig =
+  const copy: ModelCopyConfig =
     raw.copy ??
     (ui_key === "bazi_v1"
       ? {
@@ -59,6 +70,18 @@ export function parseModalConfig(
           inputHeaderSubtitle: "完成後即可查看結果",
         });
 
+  const listing: ModelListingConfig = {
+    image: resolveListingImage(modelId, slug ?? modelId, raw.listing?.image),
+    description:
+      raw.listing?.description ??
+      raw.copy?.introSubtitle ??
+      (ui_key === "bazi_v1"
+        ? "完整八字命盤解讀，從性格、感情到事業與流年運勢"
+        : undefined),
+    view_count: raw.listing?.view_count,
+    badge: raw.listing?.badge,
+  };
+
   return {
     phases: raw.phases ?? ["result", "report"],
     page_count: raw.page_count,
@@ -69,5 +92,6 @@ export function parseModalConfig(
     ui_key,
     media,
     copy,
+    listing,
   };
 }

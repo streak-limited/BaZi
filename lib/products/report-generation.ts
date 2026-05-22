@@ -1,7 +1,7 @@
 import { buildDemoReportDeliverable } from "@/lib/report-demo";
 import { queueReportReadyEmail } from "@/lib/products/email";
-import { DEFAULT_BAZI_MODAL } from "@/lib/products/modal-registry";
-import { getModalById } from "@/lib/products/modal-store";
+import { DEFAULT_BAZI_MODEL } from "@/lib/products/model-registry";
+import { getModelById } from "@/lib/products/model-store";
 import {
   getTrialById,
   saveReportDeliverable,
@@ -16,43 +16,40 @@ function reportGenerationDelayMs(): number {
   return 5000;
 }
 
-/** Background job: save demo report → completed → email */
 export async function completeReportGeneration(trialId: string): Promise<void> {
   const trial = await getTrialById(trialId);
   if (!trial) return;
 
-  const modal =
-    (await getModalById(trial.modal_template_id ?? DEFAULT_BAZI_MODAL)) ??
-    (await getModalById(DEFAULT_BAZI_MODAL));
-  if (!modal) return;
+  const model =
+    (await getModelById(trial.model_id ?? DEFAULT_BAZI_MODEL)) ??
+    (await getModelById(DEFAULT_BAZI_MODEL));
+  if (!model) return;
+
   const demo = buildDemoReportDeliverable();
 
   await saveReportDeliverable(trial.id, demo, {
     demo: true,
-    modal: modal.id,
-    page_count: modal.config.page_count,
+    model: model.id,
+    page_count: model.config.page_count,
   });
 
   await updateTrialStatus(trial.id, "completed");
   await queueReportReadyEmail(trial);
 }
 
-/** Queue report generation after payment (simulated delay for UX testing) */
 export function enqueueReportGeneration(trialId: string): void {
   const delayMs = reportGenerationDelayMs();
 
   after(async () => {
+    if (delayMs > 0) {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    await updateTrialStatus(trialId, "report_generating");
     try {
-      if (delayMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
       await completeReportGeneration(trialId);
     } catch (err) {
-      console.error("[report-generation]", trialId, err);
-      await updateTrialStatus(trialId, "failed", {
-        error_message:
-          err instanceof Error ? err.message : "Report generation failed",
-      });
+      const message = err instanceof Error ? err.message : "Report generation failed";
+      await updateTrialStatus(trialId, "failed", { error_message: message });
     }
   });
 }

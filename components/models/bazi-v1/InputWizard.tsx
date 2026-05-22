@@ -8,14 +8,14 @@ import {
   RELATIONSHIP_OPTIONS,
   SEXUALITY_OPTIONS,
 } from "@/lib/bazi-journey/config";
-import type { ModalMediaConfig } from "@/lib/modals/parse-config";
+import type { ModelMediaConfig } from "@/lib/models/parse-config";
 import type { UserFormInput } from "@/lib/user-input";
-import styles from "./modal-journey.module.css";
+import styles from "./model-journey.module.css";
 
 interface InputWizardProps {
   input: UserFormInput;
   stepIndex: number;
-  media: ModalMediaConfig;
+  media: ModelMediaConfig;
   onChange: (patch: Partial<UserFormInput>) => void;
   onStepIndex: (index: number) => void;
   onComplete: () => void;

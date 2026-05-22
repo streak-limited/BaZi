@@ -1,11 +1,11 @@
 "use client";
 
 import PageHeader from "@/components/PageHeader";
-import InputWizard from "@/components/modals/bazi-v1/InputWizard";
+import InputWizard from "@/components/models/bazi-v1/InputWizard";
 import PaidSuccessStep from "@/app/bazi/intro/PaidSuccessStep";
 import { INPUT_STEPS } from "@/lib/bazi-journey/config";
-import { journeyDraftKey } from "@/lib/modals/paths";
-import type { ModalInputProps } from "@/lib/modals/ui-registry";
+import { journeyDraftKey } from "@/lib/models/paths";
+import type { ModelInputProps } from "@/lib/models/ui-registry";
 import {
   type BaziJourneyDraft,
   type BaziJourneyStep,
@@ -16,7 +16,7 @@ import { ACTIVE_SUBJECT_KEY } from "@/lib/subject-session";
 import { DEFAULT_USER_INPUT, type UserFormInput } from "@/lib/user-input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import styles from "./modal-journey.module.css";
+import styles from "./model-journey.module.css";
 
 function loadDraft(key: string): BaziJourneyDraft | null {
   if (typeof window === "undefined") return null;
@@ -47,12 +47,12 @@ function saveDraft(key: string, draft: BaziJourneyDraft) {
   sessionStorage.setItem(key, JSON.stringify(draft));
 }
 
-export default function ModalInputClient({ modal }: ModalInputProps) {
+export default function ModelInputClient({ model }: ModelInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paidFromUrl = searchParams.get("paid") === "1";
   const demoPaid = searchParams.get("demo") === "1";
-  const draftKey = journeyDraftKey(modal.slug);
+  const draftKey = journeyDraftKey(model.slug);
 
   const [step, setStep] = useState<BaziJourneyStep>("input");
   const [input, setInput] = useState<UserFormInput>(DEFAULT_USER_INPUT);
@@ -131,8 +131,8 @@ export default function ModalInputClient({ modal }: ModalInputProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          modalSlug: modal.slug,
-          modalTemplateId: modal.id,
+          modelSlug: model.slug,
+          modelId: model.id,
           userInput: input,
           email: input.email,
           legacySubjectId: sid,
@@ -207,13 +207,13 @@ export default function ModalInputClient({ modal }: ModalInputProps) {
     }
   };
 
-  const { copy, media } = modal.config;
+  const { copy, media } = model.config;
 
   return (
     <div className={styles.shell}>
       {step !== "generating" && step !== "paid" && (
         <PageHeader
-          title={copy.inputHeaderTitle ?? modal.display_name}
+          title={copy.inputHeaderTitle ?? model.display_name}
           subtitle={copy.inputHeaderSubtitle ?? ""}
         />
       )}

@@ -1,0 +1,86 @@
+.shell {
+  min-height: 100dvh;
+  background: #000;
+  color: #fff;
+  font-family: var(--font-noto-serif-tc), "Noto Serif TC", system-ui, sans-serif;
+}
+
+.frame {
+  max-width: 440px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100dvh;
+  position: relative;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: #000;
+}
+
+.headerInner {
+  max-width: 440px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandMark {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.brandSub {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.main {
+  padding: 76px 16px 32px;
+  min-height: 100dvh;
+}
+
+/* +40px catalog offset when tag filter bar is visible (fixed under header) */
+.main:has([class*="mainWithFilter"]) {
+  padding-top: 116px;
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px dashed #27272a;
+  border-radius: 16px;
+  font-size: 0.9rem;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: rgba(255, 255, 255, 0.55);
+}

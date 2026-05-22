@@ -23,7 +23,7 @@ export default async function AdminPage() {
         <div>
           <h1>BaZi Admin</h1>
           <p className={styles.muted}>
-            Modals · Trials · Payments · Email log
+            Models · Trials · Payments · Email log
           </p>
         </div>
         <Link href="/m/bazi-full-report/intro" className={styles.muted}>
@@ -46,8 +46,8 @@ export default async function AdminPage() {
 
       <div className={styles.stats}>
         <div className={styles.statCard}>
-          <strong>{data.modals.length}</strong>
-          <span className={styles.muted}>Active modals</span>
+          <strong>{data.models.length}</strong>
+          <span className={styles.muted}>Active models</span>
         </div>
         <div className={styles.statCard}>
           <strong>{data.stats.trialCount}</strong>
@@ -64,7 +64,7 @@ export default async function AdminPage() {
       </div>
 
       <section className={styles.section}>
-        <h2>Modal templates</h2>
+        <h2>Models</h2>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
@@ -73,12 +73,13 @@ export default async function AdminPage() {
                 <th>slug</th>
                 <th>name</th>
                 <th>ui_key</th>
+                <th>tags</th>
                 <th>price</th>
                 <th>intro</th>
               </tr>
             </thead>
             <tbody>
-              {data.modals.map((m) => (
+              {data.models.map((m) => (
                 <tr key={m.id}>
                   <td>
                     <code>{m.id}</code>
@@ -87,6 +88,11 @@ export default async function AdminPage() {
                   <td>{m.display_name}</td>
                   <td>
                     <span className={styles.badge}>{m.config.ui_key}</span>
+                  </td>
+                  <td>
+                    {m.tags.length > 0
+                      ? m.tags.map((t) => t.label).join(", ")
+                      : "—"}
                   </td>
                   <td>
                     {m.config.price_hkd != null
@@ -112,7 +118,7 @@ export default async function AdminPage() {
             <thead>
               <tr>
                 <th>token</th>
-                <th>modal</th>
+                <th>model</th>
                 <th>email</th>
                 <th>status</th>
                 <th>created</th>
@@ -132,7 +138,7 @@ export default async function AdminPage() {
                     <td>
                       <code>{t.public_token.slice(0, 12)}…</code>
                     </td>
-                    <td>{t.modal_display_name}</td>
+                    <td>{t.model_display_name}</td>
                     <td>{t.email || "—"}</td>
                     <td>
                       <span className={styles.badge}>{t.status}</span>
