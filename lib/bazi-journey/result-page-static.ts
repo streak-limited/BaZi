@@ -47,6 +47,57 @@ export const RESULT_PAGE_STATIC = {
     `${TEASER_BASE}/20_price_character.png`,
   cta: bySection("cta")[0]?.content ?? "向韓國範山道令算命",
   introBg: `${TEASER_BASE}/03_intro_bg.png`,
+  speechBubble: `${TEASER_BASE}/speech_bubble_2.svg`,
+  unionDecoration: `${TEASER_BASE}/union_decoration.svg`,
+  chapterDivider: `${TEASER_BASE}/chapter_divider.svg`,
+  chapterPreviewBg: `${TEASER_BASE}/26_date_preview_3.png`,
+  finalSajuBg: `${TEASER_BASE}/28_final_saju_bg.png`,
+  chapterBorders: [
+    `${TEASER_BASE}/chapter_border_2.svg`,
+    `${TEASER_BASE}/chapter_border_2.svg`,
+    `${TEASER_BASE}/chapter_border_3.svg`,
+    `${TEASER_BASE}/chapter_border_4.svg`,
+  ] as const,
+  /** Report chapter teasers (static marketing copy on result page) */
+  chapters: [
+    {
+      title: "第一章",
+      lead: "你的內心我全都看穿了",
+      bullets: [
+        { muted: "就算死也不想被別人發現的\n", bold: "真正性格與隱藏的自卑感 👹" },
+        {
+          muted: "別人一邊罵你卻最終\n",
+          bold: "只能臣服在你腳下的原因",
+          tail: "\n（你命格中隱藏的真正武器 ✂️）",
+        },
+      ],
+    },
+    {
+      title: "第二章",
+      lead: "你內心真正的慾望\n其實更加赤裸且龐大吧。",
+      bullets: [
+        { muted: "[VIP 機密🚫] 刻在我命格裡\n", bold: "一輩子能摸到的「真正金錢」最大值" },
+        {
+          muted: "一輩子財運大爆發一次的命格？\n",
+          bold: "「人生大翻身時間點圖表」📈",
+        },
+        { muted: "想吃掉我的蛇一般的假緣分\nvs 必須留在身邊的貴人辨別法", bold: "" },
+        { muted: "現在正在不斷流失的\n", bold: "你錢包裡的3個漏財洞堵住法 🚨" },
+      ],
+    },
+    {
+      title: "第三章",
+      lead: "噓...你的命格裡\n偏偏那些承受不住的東西都纏上來。",
+      bullets: [
+        { muted: "[命運卡📮]\n", bold: "即將出現在我面前的真正緣分檔案 🧑🏻‍🦰\n" },
+        { muted: "我命格中的戀愛模式 💔\n", bold: "每次掉入同樣陷阱的原因" },
+        {
+          muted: "噓🤫 端莊外表下隱藏的\n",
+          bold: "夜晚特別合拍的伴侶條件",
+        },
+      ],
+    },
+  ] as const,
 } as const;
 
 /** Layout entries for generation (static + computed slots, no AI) */

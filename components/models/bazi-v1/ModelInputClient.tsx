@@ -1,5 +1,6 @@
 "use client";
 
+import GeneratingStep from "@/components/models/bazi-v1/GeneratingStep";
 import InputWizard from "@/components/models/bazi-v1/InputWizard";
 import JourneyShell from "@/components/models/bazi-v1/JourneyShell";
 import PaidSuccessStep from "@/app/bazi/intro/PaidSuccessStep";
@@ -216,6 +217,10 @@ export default function ModelInputClient({ model }: ModelInputProps) {
 
   const { media } = model.config;
 
+  if (step === "generating") {
+    return <GeneratingStep userInput={input} status={genStatus} />;
+  }
+
   if (step === "input") {
     return (
       <>
@@ -236,14 +241,6 @@ export default function ModelInputClient({ model }: ModelInputProps) {
   return (
     <JourneyShell backHref={`/m/${model.slug}/intro`}>
       {error && <div className={styles.errorBannerLight}>{error}</div>}
-
-      {step === "generating" && (
-        <div className={styles.generatingLight}>
-          <div className={styles.spinnerLight} />
-          <p>{genStatus || "生成中…"}</p>
-          <p className={styles.generatingSub}>正在準備你的 Result 預覽，請勿關閉頁面</p>
-        </div>
-      )}
 
       {step === "paid" && (
         <PaidSuccessStep

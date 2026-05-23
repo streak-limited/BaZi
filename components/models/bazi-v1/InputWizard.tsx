@@ -192,7 +192,7 @@ export default function InputWizard({
 
         {!soundOn ? (
           <SoundWatermark
-            key={videoKey}
+            key={`sound-${videoKey}`}
             onEnable={enableSound}
             autoHideMs={1500}
           />

@@ -100,9 +100,178 @@
   border-radius: 8px;
 }
 
+.chapterArtStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.chapterBorder,
+.chapterDivider {
+  width: 100%;
+  max-width: 320px;
+  display: block;
+}
+
+.chapterHeader {
+  padding: 24px 20px 8px;
+}
+
+.chapterBadge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 47px;
+  min-width: 124px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 0.8px solid #000;
+  background: #720000;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.5);
+}
+
+.chapterBadgeText {
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #dc2626, rgba(183, 51, 51, 0.5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sectionSubtitle {
+  margin: 20px 0 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.006em;
+  background: linear-gradient(180deg, #fff, #f44);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Page 3 profile */
 .profilePage {
-  padding: 24px 16px 32px;
+  padding: 0 0 32px;
+}
+
+.profileHero {
+  position: relative;
+  height: 478px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.profileHeroBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileHeroGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0) 62.5%, rgb(0, 0, 0) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0) 82.7%, rgb(0, 0, 0) 100%);
+}
+
+.profileHeroText {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  padding: 0 16px;
+}
+
+.profileIntroWrap {
+  padding: 0 20px 24px;
+}
+
+.profileIntroImg {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.chartSection {
+  position: relative;
+  min-height: 487px;
+  margin: 0 11px 32px;
+  overflow: hidden;
+}
+
+.chartGlow {
+  position: absolute;
+  inset: 20px 0 24px;
+  border-radius: 20px;
+  background: radial-gradient(
+    at 50% 60%,
+    rgba(169, 0, 0, 0.6) 0%,
+    rgba(100, 0, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+
+.chartBgFigure {
+  position: absolute;
+  left: 50%;
+  top: 27px;
+  width: 259px;
+  height: 421px;
+  transform: translateX(-50%);
+  object-fit: cover;
+  opacity: 0.5;
+}
+
+.chartPanel {
+  position: relative;
+  z-index: 2;
+  padding: 50px 12px 24px;
+}
+
+.glyphGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.glyphCell {
+  display: flex;
+  justify-content: center;
+}
+
+.glyphImg {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.dobLine {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 12px 0;
+}
+
+.chartBanner {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 16px;
+  display: block;
 }
 
 .pillarBlock {
@@ -164,19 +333,223 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
-.narrativeAi {
-  padding-left: 14px;
-  border-left: 3px solid rgba(219, 39, 119, 0.6);
+.contentPage .chipRow,
+.profilePage .chipRow {
+  padding: 0 20px;
 }
 
-.sectionImg {
+.contentBody {
+  padding: 8px 20px 24px;
+  font-family: var(--font-noto-sans-tc), "Noto Sans TC", sans-serif;
+}
+
+.contentBlock + .contentBlock {
+  margin-top: 8px;
+}
+
+.blockHeading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 14px 0 4px;
+}
+
+.introLead {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(248, 250, 252, 0.95);
+  margin: 0 0 16px;
+  white-space: pre-line;
+}
+
+.heroFigureWrap {
+  padding: 0 20px 16px;
+}
+
+.heroFigure {
   width: 100%;
-  border-radius: 10px;
-  margin: 16px 0;
+  max-height: 320px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.sceneWrap {
+  position: relative;
+  min-height: 280px;
+  margin: 0 0 16px;
+  overflow: hidden;
+}
+
+.sceneBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sceneGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.85));
+}
+
+.sceneCharacter {
+  position: relative;
+  z-index: 2;
+  width: 55%;
+  max-height: 260px;
+  object-fit: contain;
+  margin: 24px auto 0;
   display: block;
 }
 
-/* Default pages 4–20 */
+.sceneBanner {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 40px);
+  margin: 16px auto 0;
+  display: block;
+  border-radius: 8px;
+}
+
+.standaloneBanner {
+  width: calc(100% - 40px);
+  margin: 0 auto 16px;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Page 20 closing */
+.closingPage {
+  padding: 0 0 32px;
+}
+
+.ctaCard {
+  margin: 0 20px 24px;
+  min-height: 520px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: rgb(30, 30, 30);
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.ctaCardInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 520px;
+  padding: 24px 20px 28px;
+  background: linear-gradient(transparent 35%, rgba(0, 0, 0, 0.75));
+}
+
+.ctaTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 10px;
+  white-space: pre-line;
+  color: #fff;
+}
+
+.ctaDesc {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 16px;
+}
+
+.ctaButton {
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.closingSection {
+  padding: 24px 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.thanksLine {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 16px;
+  white-space: pre-line;
+}
+
+.reportBtn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.reportNote {
+  font-size: 0.8rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+.recSection {
+  padding: 0 16px 24px;
+}
+
+.recTitle {
+  font-size: 1.1rem;
+  margin: 0 0 4px;
+}
+
+.recSub,
+.recCategory {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0 0 8px;
+}
+
+.recGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.recCard {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.recImg {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.recLabel {
+  font-size: 0.75rem;
+  padding: 8px;
+  margin: 0;
+  text-align: center;
+}
+
+/* Legacy default (fallback) */
 .defaultPage {
   padding: 28px 18px 36px;
 }

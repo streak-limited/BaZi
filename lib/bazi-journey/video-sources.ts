@@ -28,6 +28,10 @@ export const BAZI_JOURNEY_VIDEOS = {
   input2: {
     mp4: `${MEDIA}/input/mzmudang_input_video_2.mp4`,
   },
+  loading: {
+    webm: `${MEDIA}/loading/mzmudang_loading_video.webm`,
+    mp4: `${MEDIA}/loading/mzmudang_loading_video.mp4`,
+  },
 } as const;
 
 export function videoSourceKey(source: JourneyVideoSource): string {

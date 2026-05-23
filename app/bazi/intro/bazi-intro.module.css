@@ -179,12 +179,20 @@
 }
 
 /* Pre-report sections */
+.resultShell {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
 .preRoot {
   background: #000;
   display: flex;
   flex-direction: column;
   gap: 50px;
-  padding-bottom: 120px;
+  padding-bottom: 160px;
 }
 
 .section {
@@ -502,10 +510,573 @@
 }
 
 .errorBanner {
-  margin: 12px 20px;
+  margin: 12px 0;
   padding: 12px;
   border-radius: 8px;
   background: rgba(180, 0, 0, 0.35);
   border: 1px solid #a33;
   font-size: 0.9rem;
+}
+
+.ageGradient {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3.1rem;
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #fff 0%, #f44 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.chartLabelGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 10px;
+  padding: 8px 16px 0;
+}
+
+.chartLabel {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.worryLine {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.narrativePalzaOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0) 86%,
+      rgb(0, 0, 0) 100%
+    ),
+    linear-gradient(rgba(0, 0, 0, 0) 75%, rgb(0, 0, 0) 100%);
+  pointer-events: none;
+}
+
+.speechBubbleWrap {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  width: 180px;
+  min-height: 263px;
+}
+
+.speechBubbleImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.speechBubbleText {
+  position: relative;
+  z-index: 1;
+  padding: 48px 20px 32px;
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.55;
+  white-space: pre-line;
+  color: #111;
+}
+
+.flowerSection {
+  position: relative;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.flowerDecoration {
+  display: block;
+  width: min(335px, 92%);
+  margin: 0 auto 20px;
+}
+
+.flowerLine {
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.flowerAsset {
+  width: min(259px, 70%);
+  margin: 16px auto 0;
+  display: block;
+  opacity: 0.55;
+}
+
+.moneySub {
+  margin-top: 16px;
+  opacity: 0.85;
+}
+
+.expertList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.chapterPreviewSection {
+  position: relative;
+  min-height: 420px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.chapterPreviewLead {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin-bottom: 24px;
+}
+
+.chapterPreviewImages {
+  position: relative;
+  height: 320px;
+  overflow: hidden;
+  opacity: 0.85;
+}
+
+.chapterPreviewImg {
+  width: 234%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.chapterPreviewNote {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.chaptersSection {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 0 16px 40px;
+}
+
+.chapterCard {
+  position: relative;
+  width: min(304px, 100%);
+  margin: 0 auto;
+}
+
+.chapterBorder {
+  pointer-events: none;
+  position: absolute;
+  inset: -50px;
+  background: var(--chapter-border) center / contain no-repeat;
+}
+
+.chapterInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.chapterBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 155px;
+  height: 59px;
+  border-radius: 20px;
+  border: 1px solid #000;
+  background: #720000;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  font-size: 2.5rem;
+  font-weight: 700;
+  background-image: linear-gradient(rgb(255, 0, 0) 0%, rgba(183, 51, 51, 0.5) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.chapterLead {
+  margin: 18px 0 0;
+  text-align: center;
+  white-space: pre-line;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.chapterDivider {
+  margin-top: 6px;
+  width: 141px;
+  height: 21px;
+}
+
+.chapterBullets {
+  margin: 17px auto 0;
+  width: min(266px, 100%);
+  padding-left: 25px;
+  list-style: disc;
+}
+
+.chapterBullets li {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.chapterMuted {
+  color: rgba(255, 255, 255, 0.7);
+  white-space: pre-line;
+}
+
+.chapterBold {
+  font-weight: 700;
+  color: #fff;
+  white-space: pre-line;
+}
+
+.finalSajuSection {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.finalSajuBg {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.finalSajuText {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  width: 90%;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.resultCtaBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 12px 0 max(20px, env(safe-area-inset-bottom));
+  background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.85) 30%, #000 100%);
+  pointer-events: none;
+}
+
+.resultCtaInner {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+/* Payment drawer */
+.drawerRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.drawerBackdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.drawerSheet {
+  position: relative;
+  flex: 0 1 440px;
+  width: 100%;
+  max-width: 440px;
+  max-height: min(92dvh, 720px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 16px 16px 0 0;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 10px 16px max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  animation: drawerSlideUp 0.35s ease-out;
+}
+
+.drawerSheet .errorBanner,
+.drawerSheet .testModeBadge {
+  margin: 8px 0;
+}
+
+@keyframes drawerSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.drawerHandle {
+  width: 32px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 0 auto 16px;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.drawerDiscount {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ff1e64;
+}
+
+.drawerPrice {
+  margin: 4px 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.drawerSaveBadge {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 30, 100, 0.15);
+  color: #ff6b9d;
+  font-size: 0.8rem;
+}
+
+.drawerClose {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.drawerSectionLabel {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.drawerPlan,
+.drawerPlanActive {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.drawerPlanActive {
+  border-color: #ff1e64;
+  background: rgba(255, 30, 100, 0.08);
+}
+
+.drawerRadio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.drawerRadio[data-active="true"] {
+  border-color: #ff1e64;
+  background: radial-gradient(circle, #ff1e64 40%, transparent 45%);
+}
+
+.drawerPlanText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.drawerPlanPrice {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.drawerPlanSub {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.drawerPlanPriceCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.drawerPlanStrike {
+  text-decoration: line-through;
+  opacity: 0.45;
+  font-size: 0.75rem;
+}
+
+.drawerPlanPct {
+  color: #ff1e64;
+  font-size: 0.75rem;
+}
+
+.drawerBreakdown {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.drawerRow {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.drawerRowDiscount {
+  display: flex;
+  justify-content: space-between;
+  color: #ff1e64;
+}
+
+.drawerCoupon {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drawerMuted {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.drawerContinue {
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px;
+  border: none;
+  border-radius: 999px;
+  background: #ff1e64;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.drawerContinue:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.drawerDemoBtn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+}
+
+.drawerLegal {
+  margin: 16px 0 12px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.drawerLegal a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: underline;
+}
+
+.drawerMarketing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.drawerInfoLink {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.72rem;
+}
+
+.drawerTokenNote {
+  display: none;
 }

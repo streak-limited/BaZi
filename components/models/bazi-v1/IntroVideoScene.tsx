@@ -114,7 +114,7 @@ export default function IntroVideoScene({
 
       {showSoundPrompt ? (
         <SoundWatermark
-          key={videoSourceKey(sources)}
+          key={`sound-${videoSourceKey(sources)}`}
           onEnable={handleSoundEnable}
           autoHideMs={1500}
         />
