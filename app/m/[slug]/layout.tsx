@@ -17,6 +17,8 @@ export default async function ModelJourneyLayout({
   if (!model) notFound();
 
   return (
-    <ModelJourneyProvider model={model}>{children}</ModelJourneyProvider>
+    <ModelJourneyProvider model={model}>
+      <div style={{ minHeight: "100dvh", background: "#fff" }}>{children}</div>
+    </ModelJourneyProvider>
   );
 }

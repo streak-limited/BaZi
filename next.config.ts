@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/bazi/intro",
-        destination: "/m/bazi-full-report/intro",
+        destination: "/m/bazi-full-report",
         permanent: false,
       },
       {

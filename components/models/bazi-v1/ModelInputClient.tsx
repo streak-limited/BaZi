@@ -1,7 +1,7 @@
 "use client";
 
-import PageHeader from "@/components/PageHeader";
 import InputWizard from "@/components/models/bazi-v1/InputWizard";
+import JourneyShell from "@/components/models/bazi-v1/JourneyShell";
 import PaidSuccessStep from "@/app/bazi/intro/PaidSuccessStep";
 import { INPUT_STEPS } from "@/lib/bazi-journey/config";
 import { journeyDraftKey } from "@/lib/models/paths";
@@ -55,7 +55,14 @@ export default function ModelInputClient({ model }: ModelInputProps) {
   const draftKey = journeyDraftKey(model.slug);
 
   const [step, setStep] = useState<BaziJourneyStep>("input");
-  const [input, setInput] = useState<UserFormInput>(DEFAULT_USER_INPUT);
+  const [input, setInput] = useState<UserFormInput>({
+    ...DEFAULT_USER_INPUT,
+    birthDate: "",
+    birthTime: "",
+    birthTimeUnknown: false,
+    name: "",
+    email: "",
+  });
   const [inputStepIndex, setInputStepIndex] = useState(0);
   const [subjectId, setSubjectId] = useState<string | null>(null);
   const [publicToken, setPublicToken] = useState<string | null>(null);
@@ -207,21 +214,14 @@ export default function ModelInputClient({ model }: ModelInputProps) {
     }
   };
 
-  const { copy, media } = model.config;
+  const { media } = model.config;
 
-  return (
-    <div className={styles.shell}>
-      {step !== "generating" && step !== "paid" && (
-        <PageHeader
-          title={copy.inputHeaderTitle ?? model.display_name}
-          subtitle={copy.inputHeaderSubtitle ?? ""}
-        />
-      )}
-
-      {error && <div className={styles.errorBanner}>{error}</div>}
-
-      {step === "input" && (
+  if (step === "input") {
+    return (
+      <>
+        {error && <div className={styles.errorBannerLight}>{error}</div>}
         <InputWizard
+          modelSlug={model.slug}
           input={input}
           stepIndex={inputStepIndex}
           media={media}
@@ -229,15 +229,19 @@ export default function ModelInputClient({ model }: ModelInputProps) {
           onStepIndex={setInputStepIndex}
           onComplete={runGenerate}
         />
-      )}
+      </>
+    );
+  }
+
+  return (
+    <JourneyShell backHref={`/m/${model.slug}/intro`}>
+      {error && <div className={styles.errorBannerLight}>{error}</div>}
 
       {step === "generating" && (
-        <div className={styles.generating}>
-          <div className={styles.spinner} />
+        <div className={styles.generatingLight}>
+          <div className={styles.spinnerLight} />
           <p>{genStatus || "生成中…"}</p>
-          <p style={{ fontSize: "0.85rem", opacity: 0.65 }}>
-            正在呼叫 AI，請勿關閉頁面
-          </p>
+          <p className={styles.generatingSub}>正在準備你的 Result 預覽，請勿關閉頁面</p>
         </div>
       )}
 
@@ -248,6 +252,6 @@ export default function ModelInputClient({ model }: ModelInputProps) {
           reportHubUrl={reportHubUrl}
         />
       )}
-    </div>
+    </JourneyShell>
   );
 }

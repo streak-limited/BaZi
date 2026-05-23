@@ -1,3 +1,4 @@
+import type { JourneyVideoSource } from "@/lib/bazi-journey/video-sources";
 import type { UserFormInput } from "@/lib/user-input";
 import type { BirthPlace } from "@/lib/astrology/types";
 import type { ReportData } from "@/lib/report-types";
@@ -35,9 +36,13 @@ export interface ModelConfig {
   /** UI bundle key — maps to lib/models/ui-registry */
   ui_key?: string;
   media?: {
-    introVideo?: string;
-    inputVideo1?: string;
-    inputVideo2?: string;
+    welcomeVideo?: string | JourneyVideoSource;
+    introVideo?: string | JourneyVideoSource;
+    introVideo1?: string | JourneyVideoSource;
+    introVideo2?: string | JourneyVideoSource;
+    introVideo3?: string | JourneyVideoSource;
+    inputVideo1?: string | JourneyVideoSource;
+    inputVideo2?: string | JourneyVideoSource;
   };
   copy?: {
     introTitle?: string;

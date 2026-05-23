@@ -1,7 +1,15 @@
 import { getAppBaseUrl } from "@/lib/supabase/server";
 
+export function modelWelcomePath(slug: string): string {
+  return `/m/${slug}`;
+}
+
 export function modelIntroPath(slug: string): string {
   return `/m/${slug}/intro`;
+}
+
+export function journeySoundKey(slug: string): string {
+  return `journey-sound-${slug}`;
 }
 
 export function modelInputPath(slug: string): string {

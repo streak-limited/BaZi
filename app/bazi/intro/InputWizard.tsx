@@ -9,6 +9,7 @@ import {
   RELATIONSHIP_OPTIONS,
   SEXUALITY_OPTIONS,
 } from "@/lib/bazi-journey/config";
+import { videoSourceKey } from "@/lib/bazi-journey/video-sources";
 import type { UserFormInput } from "@/lib/user-input";
 import styles from "./bazi-intro.module.css";
 
@@ -39,7 +40,7 @@ export default function InputWizard({
   onComplete,
 }: InputWizardProps) {
   const step = INPUT_STEPS[stepIndex];
-  const videoSrc =
+  const video =
     step.videoIndex === 2
       ? BAZI_JOURNEY_MEDIA.inputVideo2
       : BAZI_JOURNEY_MEDIA.inputVideo1;
@@ -60,9 +61,9 @@ export default function InputWizard({
     <div className={styles.narrow}>
       <div className={styles.mediaWrap}>
         <video
-          key={videoSrc}
+          key={videoSourceKey(video)}
           className={styles.video}
-          src={videoSrc}
+          src={video.mp4}
           autoPlay
           muted
           playsInline
@@ -105,7 +106,7 @@ export default function InputWizard({
             <input
               className={styles.textInput}
               type="text"
-              placeholder="1995.08.09"
+              placeholder="2000.01.01"
               value={input.birthDate}
               onChange={(e) => onChange({ birthDate: e.target.value })}
             />
@@ -117,7 +118,7 @@ export default function InputWizard({
             <input
               className={styles.textInput}
               type="text"
-              placeholder="10:10"
+              placeholder="13:30"
               value={input.birthTime}
               disabled={input.birthTimeUnknown}
               onChange={(e) => onChange({ birthTime: e.target.value })}

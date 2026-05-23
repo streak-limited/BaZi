@@ -9,13 +9,18 @@ import {
   type SexualityChoice,
 } from "@/lib/user-input";
 
-const MEDIA =
-  "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw";
+import { BAZI_JOURNEY_VIDEOS, type JourneyVideoSource } from "@/lib/bazi-journey/video-sources";
+
+export type { JourneyVideoSource };
 
 export const BAZI_JOURNEY_MEDIA = {
-  introVideo: `${MEDIA}/immersion/mzmudang_immersion_1.mp4`,
-  inputVideo1: `${MEDIA}/input/mzmudang_input_video_1.mp4`,
-  inputVideo2: `${MEDIA}/input/mzmudang_input_video_2.mp4`,
+  welcomeVideo: BAZI_JOURNEY_VIDEOS.welcome,
+  introVideo: BAZI_JOURNEY_VIDEOS.intro1,
+  introVideo1: BAZI_JOURNEY_VIDEOS.intro1,
+  introVideo2: BAZI_JOURNEY_VIDEOS.intro2,
+  introVideo3: BAZI_JOURNEY_VIDEOS.intro3,
+  inputVideo1: BAZI_JOURNEY_VIDEOS.input1,
+  inputVideo2: BAZI_JOURNEY_VIDEOS.input2,
 } as const;
 
 /** @deprecated Use BAZI_JOURNEY_MEDIA */
@@ -52,52 +57,51 @@ export const INPUT_STEPS: InputStepDef[] = [
     id: "birth",
     field: "birthDateGroup",
     title: "告訴我你的出生年月日",
-    subtitle: "國曆或農曆都可以",
     videoIndex: 1,
   },
   {
     id: "time",
     field: "birthTime",
-    title: "出生時間是幾點？",
-    subtitle: "不知道可以勾選下方",
+    title: "出生時間是？",
     videoIndex: 1,
   },
   {
     id: "gender",
     field: "gender",
-    title: "你的性別是？",
+    title: "你的性別？",
     videoIndex: 1,
   },
   {
     id: "sexuality",
     field: "sexuality",
-    title: "你的感情取向？",
+    title: "你的取向是什麼？",
+    subtitle: "話說回來...",
     videoIndex: 2,
   },
   {
     id: "relationship",
     field: "relationship",
-    title: "你現在的感情狀態？",
+    title: "有對象嗎？",
+    subtitle: "原來如此，",
     videoIndex: 2,
   },
   {
     id: "job",
     field: "job",
-    title: "你現在的狀態？",
+    title: "工作還順利嗎？",
+    subtitle: "嗯嗯，",
     videoIndex: 2,
   },
   {
     id: "name",
     field: "name",
-    title: "怎麼稱呼你？",
-    subtitle: "可留空，之後再補",
+    title: "你叫什麼名字？",
     videoIndex: 2,
   },
   {
     id: "email",
     field: "email",
-    title: "留下 Email（選填）",
-    subtitle: "付款後寄完整報告連結",
+    title: "最後告訴我你的電子信箱",
     videoIndex: 2,
   },
 ];
@@ -110,3 +114,8 @@ export const CALENDAR_OPTIONS: { value: CalendarType; label: string }[] = [
 ];
 
 export { JOB_OPTIONS, RELATIONSHIP_OPTIONS };
+
+export const SEXUALITY_LABELS: Record<SexualityChoice, string> = {
+  異性戀: "異性戀 (Hetero)",
+  同性戀: "同性戀 (LGBT+)",
+};

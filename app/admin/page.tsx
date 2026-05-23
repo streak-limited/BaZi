@@ -30,8 +30,8 @@ export default async function AdminPage() {
           <Link href="/admin/models" className={styles.muted}>
             Manage models & prompts →
           </Link>
-          <Link href="/m/bazi-full-report/intro" className={styles.muted}>
-            產品 intro →
+          <Link href="/m/bazi-full-report" className={styles.muted}>
+            產品入口 →
           </Link>
         </div>
       </header>
@@ -106,6 +106,8 @@ export default async function AdminPage() {
                   </td>
                   <td>
                     <Link href={`/admin/models/${m.id}`}>edit</Link>
+                    {" · "}
+                    <Link href={`/m/${m.slug}`}>start</Link>
                     {" · "}
                     <Link href={`/m/${m.slug}/intro`}>intro</Link>
                     {" · "}

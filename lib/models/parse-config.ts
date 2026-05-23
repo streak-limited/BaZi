@@ -1,13 +1,16 @@
+import { BAZI_JOURNEY_VIDEOS } from "@/lib/bazi-journey/video-sources";
+import type { JourneyVideoSource } from "@/lib/bazi-journey/video-sources";
 import { resolveListingImage } from "@/lib/models/listing-image";
 import type { ModelConfig } from "@/lib/products/types";
 
-const DEFAULT_MEDIA_BASE =
-  "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw";
-
 export interface ModelMediaConfig {
-  introVideo?: string;
-  inputVideo1?: string;
-  inputVideo2?: string;
+  welcomeVideo?: string | JourneyVideoSource;
+  introVideo?: string | JourneyVideoSource;
+  introVideo1?: string | JourneyVideoSource;
+  introVideo2?: string | JourneyVideoSource;
+  introVideo3?: string | JourneyVideoSource;
+  inputVideo1?: string | JourneyVideoSource;
+  inputVideo2?: string | JourneyVideoSource;
 }
 
 export interface ModelCopyConfig {
@@ -43,15 +46,19 @@ export function parseModelConfig(
 ): ParsedModelConfig {
   const ui_key = raw.ui_key ?? modelId;
   const media: ModelMediaConfig = {
+    welcomeVideo: raw.media?.welcomeVideo ?? BAZI_JOURNEY_VIDEOS.welcome,
     introVideo:
       raw.media?.introVideo ??
-      `${DEFAULT_MEDIA_BASE}/immersion/mzmudang_immersion_1.mp4`,
-    inputVideo1:
-      raw.media?.inputVideo1 ??
-      `${DEFAULT_MEDIA_BASE}/input/mzmudang_input_video_1.mp4`,
-    inputVideo2:
-      raw.media?.inputVideo2 ??
-      `${DEFAULT_MEDIA_BASE}/input/mzmudang_input_video_2.mp4`,
+      raw.media?.introVideo1 ??
+      BAZI_JOURNEY_VIDEOS.intro1,
+    introVideo1:
+      raw.media?.introVideo1 ??
+      raw.media?.introVideo ??
+      BAZI_JOURNEY_VIDEOS.intro1,
+    introVideo2: raw.media?.introVideo2 ?? BAZI_JOURNEY_VIDEOS.intro2,
+    introVideo3: raw.media?.introVideo3 ?? BAZI_JOURNEY_VIDEOS.intro3,
+    inputVideo1: raw.media?.inputVideo1 ?? BAZI_JOURNEY_VIDEOS.input1,
+    inputVideo2: raw.media?.inputVideo2 ?? BAZI_JOURNEY_VIDEOS.input2,
   };
 
   const copy: ModelCopyConfig =

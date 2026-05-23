@@ -1,17 +1,20 @@
 "use client";
 
+import JourneyVideo from "@/components/models/bazi-v1/JourneyVideo";
+import { asVideoSource } from "@/lib/bazi-journey/video-sources";
 import type { ModelIntroProps } from "@/lib/models/ui-registry";
 import styles from "@/components/models/bazi-v1/model-journey.module.css";
 
 export default function GenericIntroStep({ model, onContinue }: ModelIntroProps) {
   const { media, copy } = model.config;
+  const introVideo = asVideoSource(media.introVideo);
   return (
     <div className={styles.narrow}>
-      {media.introVideo ? (
+      {introVideo ? (
         <div className={styles.mediaWrap}>
-          <video
+          <JourneyVideo
             className={styles.video}
-            src={media.introVideo}
+            sources={introVideo}
             autoPlay
             muted
             playsInline

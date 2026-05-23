@@ -35,9 +35,9 @@ export interface UserFormInput {
 }
 
 export const DEFAULT_USER_INPUT: UserFormInput = {
-  birthDate: "1995.08.09",
+  birthDate: "",
   calendarType: "solar",
-  birthTime: "10:10",
+  birthTime: "",
   birthTimeUnknown: false,
   gender: "男生",
   name: "",
@@ -108,6 +108,25 @@ export function parseBirthDate(raw: string): { y: number; m: number; d: number }
   return { y, m: mo, d };
 }
 
+/** Auto-insert dots while typing: 19921 → 1992.1, 1992111 → 1992.11.1 */
+export function formatBirthDateInput(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 8);
+  const year = digits.slice(0, 4);
+  const month = digits.slice(4, 6);
+  const day = digits.slice(6, 8);
+
+  if (digits.length <= 4) return year;
+  if (digits.length === 5) return `${year}.${month.charAt(0)}`;
+  if (digits.length === 6) return `${year}.${month}`;
+  return `${year}.${month}.${day}`;
+}
+
+export function isBirthDateComplete(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 8) return false;
+  return parseBirthDate(value) !== null;
+}
+
 export function parseBirthTime(raw: string): { h: number; min: number } | null {
   const m = /^(\d{1,2}):(\d{2})$/.exec(raw.trim());
   if (!m) return null;
@@ -115,6 +134,23 @@ export function parseBirthTime(raw: string): { h: number; min: number } | null {
   const min = Number(m[2]);
   if (h < 0 || h > 23 || min < 0 || min > 59) return null;
   return { h, min };
+}
+
+/** Auto-insert colon while typing: 093 → 09:3 */
+export function formatBirthTimeInput(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 4);
+  const hours = digits.slice(0, 2);
+  const mins = digits.slice(2, 4);
+
+  if (digits.length <= 2) return hours;
+  if (digits.length === 3) return `${hours}:${mins.charAt(0)}`;
+  return `${hours}:${mins}`;
+}
+
+export function isBirthTimeComplete(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 4) return false;
+  return parseBirthTime(value) !== null;
 }
 
 export function formatBirthDateForPrompt(parsed: {

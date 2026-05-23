@@ -9,7 +9,7 @@ export default function IntroStep({ onContinue }: { onContinue: () => void }) {
       <div className={styles.mediaWrap}>
         <video
           className={styles.video}
-          src={BAZI_JOURNEY_MEDIA.introVideo}
+          src={BAZI_JOURNEY_MEDIA.introVideo.mp4}
           autoPlay
           muted
           playsInline

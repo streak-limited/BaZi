@@ -12,7 +12,7 @@ function ModelInputInner() {
 
 export default function ModelInputPage() {
   return (
-    <Suspense fallback={<p style={{ padding: 24, color: "#fff" }}>載入中…</p>}>
+    <Suspense fallback={<p style={{ padding: 24, color: "#666" }}>載入中…</p>}>
       <ModelInputInner />
     </Suspense>
   );

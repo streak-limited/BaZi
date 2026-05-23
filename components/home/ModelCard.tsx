@@ -1,5 +1,5 @@
 import { formatViewCount } from "@/lib/models/format-views";
-import { modelIntroPath } from "@/lib/models/paths";
+import { modelWelcomePath } from "@/lib/models/paths";
 import type { ProductModel } from "@/lib/products/model-store";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export default function ModelCard({
   const viewsLabel = formatViewCount(views);
 
   return (
-    <Link href={modelIntroPath(model.slug)} className={styles.card}>
+    <Link href={modelWelcomePath(model.slug)} className={styles.card}>
       <div className={styles.media}>
         {image ? (
           <Image
