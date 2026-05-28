@@ -51,10 +51,8 @@ export function parseModelConfig(
       raw.media?.introVideo ??
       raw.media?.introVideo1 ??
       BAZI_JOURNEY_VIDEOS.intro1,
-    introVideo1:
-      raw.media?.introVideo1 ??
-      raw.media?.introVideo ??
-      BAZI_JOURNEY_VIDEOS.intro1,
+    /** Scene 1 only — do not inherit legacy `introVideo` (often old Supabase URL in DB). */
+    introVideo1: raw.media?.introVideo1 ?? BAZI_JOURNEY_VIDEOS.intro1,
     introVideo2: raw.media?.introVideo2 ?? BAZI_JOURNEY_VIDEOS.intro2,
     introVideo3: raw.media?.introVideo3 ?? BAZI_JOURNEY_VIDEOS.intro3,
     inputVideo1: raw.media?.inputVideo1 ?? BAZI_JOURNEY_VIDEOS.input1,

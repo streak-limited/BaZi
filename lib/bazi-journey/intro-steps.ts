@@ -55,7 +55,7 @@ export function introVideosFromMedia(media: {
   introVideo3?: string | JourneyVideoSource;
 }): JourneyVideoSource[] {
   return [
-    asVideoSource(media.introVideo1 ?? media.introVideo, MEDIA.introVideo1)!,
+    asVideoSource(media.introVideo1, MEDIA.introVideo1)!,
     asVideoSource(media.introVideo2, MEDIA.introVideo2)!,
     asVideoSource(media.introVideo3, MEDIA.introVideo3)!,
   ];

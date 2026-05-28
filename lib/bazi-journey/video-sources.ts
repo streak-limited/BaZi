@@ -7,11 +7,9 @@ export type JourneyVideoSource = {
 const MEDIA =
   "https://wvgwlwaqlhewhobzauda.supabase.co/storage/v1/object/public/products-media/products/mzmudang-tw";
 
-function immersion(n: 1 | 2 | 3): JourneyVideoSource {
-  return {
-    webm: `${MEDIA}/immersion/mzmudang_immersion_${n}.webm`,
-    mp4: `${MEDIA}/immersion/mzmudang_immersion_${n}.mp4`,
-  };
+/** Intro immersion scenes — served from /public/video/{n}.mp4 */
+function localIntro(n: 1 | 2 | 3): JourneyVideoSource {
+  return { mp4: `/video/${n}.mp4` };
 }
 
 export const BAZI_JOURNEY_VIDEOS = {
@@ -19,9 +17,9 @@ export const BAZI_JOURNEY_VIDEOS = {
     webm: `${MEDIA}/onboarding/mzmudang_onboarding_video.webm`,
     mp4: `${MEDIA}/onboarding/mzmudang_onboarding_video.mp4`,
   },
-  intro1: immersion(1),
-  intro2: immersion(2),
-  intro3: immersion(3),
+  intro1: localIntro(1),
+  intro2: localIntro(2),
+  intro3: localIntro(3),
   input1: {
     mp4: `${MEDIA}/input/mzmudang_input_video_1.mp4`,
   },
